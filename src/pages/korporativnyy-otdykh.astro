@@ -1,0 +1,166 @@
+---
+import Advantages from '@/components/blocks/Advantages.astro';
+import LeadFooter from '@/components/blocks/LeadFooter.astro';
+import LeadSuccess from '@/components/blocks/LeadSuccess.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Field from '@/components/ui/Field.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Pic from '@/components/ui/Pic.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import { corporate } from '@/data/offers';
+import { pages } from '@/data/pages';
+import { mainPhone, site } from '@/data/site';
+import Base from '@/layouts/Base.astro';
+import { telHref } from '@/lib/format';
+import { servicePageLd } from '@/lib/schema';
+
+const meta = pages.corporate;
+const origin = String(Astro.site);
+const uid = 'corp';
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  path={meta.path}
+  jsonLd={servicePageLd(origin, { name: 'Корпоративный отдых', path: meta.path, crumb: meta.crumb, location: 'mirny' })}
+>
+  <PageHero
+    photo="snow-sunset"
+    eyebrow={`От ${corporate.min} до ${corporate.max} человек`}
+    title="Корпоративный отдых на природе в Казани"
+    lead="Площадка для корпоративов «под ключ»: заезды на технике, банкет, баня и размещение. Организуем от идеи до реализации."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    cta={false}
+    facts={[
+      { icon: 'users', label: 'Гостей', value: `${corporate.min}–${corporate.max}` },
+      { icon: 'badge-check', label: 'Формат', value: '«под ключ»' },
+      { icon: 'map-pin', label: 'Где', value: site.fromCenter },
+      { icon: 'trophy', label: 'Опыт', value: `${site.years.value} лет`, clarify: site.years.clarify },
+    ]}
+    secondary={{ label: 'Рассчитать корпоратив', href: '#raschet', icon: 'calculator' }}
+  />
+
+  <section class="section" aria-labelledby="team-title">
+    <div class="container-x grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class="reveal">
+        <p class="eyebrow mb-3">Зачем</p>
+        <h2 id="team-title" class="h-section">Спортивный корпоратив, который объединяет команду</h2>
+        <p class="lead mt-4">
+          Корпоратив давно вышел за рамки застолья. Совместные заезды и общие впечатления помогают:
+        </p>
+        <ul class="ticks mt-5 text-lg">
+          {corporate.benefits.map((b) => <li class="first-letter:uppercase">{b}</li>)}
+        </ul>
+        <p class="mt-6 text-muted">Каждый участник вовлечён: от спокойных активностей до экстремальных приключений.</p>
+      </div>
+      <div class="reveal photo-shade relative aspect-[4/3] overflow-hidden rounded-3xl border border-line" style="--d:120ms">
+        <Pic photo="jet-duo" sizes="(min-width: 1024px) 45vw, 100vw" widths={[480, 800, 1200]} />
+      </div>
+    </div>
+  </section>
+
+  <section class="slant bg-surface-grad" aria-labelledby="seasons-title">
+    <div class="container-x">
+      <SectionHead id="seasons-title" eyebrow="Программы по сезонам" title="Что делать зимой, летом и в межсезонье" />
+      <ul class="mt-10 grid gap-5 md:grid-cols-3">
+        {
+          corporate.seasons.map((s, i) => (
+            <li class="reveal" style={`--d:${i * 90}ms`}>
+              <article class="card card-hover flex h-full flex-col overflow-hidden">
+                <div class="photo-shade relative aspect-[16/10] overflow-hidden">
+                  <Pic photo={s.photo} sizes="(min-width: 768px) 33vw, 100vw" widths={[400, 700]} />
+                  <span class="chip absolute left-4 top-4 z-10 bg-ink/70">
+                    <Icon name={s.icon} size={16} class="text-glow" />
+                    {s.id === 'summer' ? 'Лето' : s.id === 'winter' ? 'Зима' : 'Весна и осень'}
+                  </span>
+                </div>
+                <div class="flex flex-1 flex-col p-6">
+                  <h3 class="font-display text-lg font-bold">{s.title}</h3>
+                  <ul class="ticks mt-4 text-sm">
+                    {s.items.map((x) => <li class="first-letter:uppercase">{x}</li>)}
+                  </ul>
+                </div>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Advantages items={corporate.turnkey} title="Организация «под ключ» — на нас" eyebrow="Что берём на себя" />
+
+  <section class="slant bg-surface-grad" aria-labelledby="infra-title">
+    <div class="container-x">
+      <SectionHead id="infra-title" eyebrow="Инфраструктура базы" title="Всё для праздника на одной площадке" lead="Цены на баню, дома, банкетный зал и активности — по запросу у администратора." />
+      <ul class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          corporate.infrastructure.map((f, i) => (
+            <li class="reveal card flex items-center gap-4 p-5" style={`--d:${(i % 4) * 60}ms`}>
+              <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-deep/25 text-glow ring-1 ring-glow/30">
+                <Icon name={f.icon} size={22} />
+              </span>
+              <span class="font-bold">{f.title}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section id="raschet" class="section" aria-labelledby="corp-form-title">
+    <div class="container-x grid gap-10 lg:grid-cols-[0.9fr_1.3fr]">
+      <div class="reveal">
+        <p class="eyebrow mb-3">Расчёт</p>
+        <h2 id="corp-form-title" class="h-section">Рассчитать корпоратив</h2>
+        <p class="lead mt-4">Расскажите о команде — предложим программу, технику и смету.</p>
+        <p class="mt-6 text-sm text-muted">
+          Или позвоните: <a href={telHref(mainPhone.e164)} class="font-bold text-text hover:text-glow">{mainPhone.display}</a>
+        </p>
+      </div>
+      <div class="reveal card p-5 sm:p-8" style="--d:120ms">
+        <form class="lead-form grid gap-4" novalidate data-lead-form data-lead-title="Заявка на корпоратив с сайта «От винта»">
+          <div class="lead-fields grid gap-4">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <Field uid={uid} name="company" label="Компания" placeholder="Название компании" />
+              <Field uid={uid} name="people" label="Сколько человек" type="number" min={corporate.min} max={corporate.max} required error={`От ${corporate.min} до ${corporate.max} человек`} />
+              <Field uid={uid} name="season" label="Сезон" type="select" options={corporate.seasons.map((s) => s.title)} />
+              <Field uid={uid} name="date" label="Желаемая дата" type="date" error="Выберите дату не раньше сегодняшней" />
+            </div>
+            <fieldset>
+              <legend class="field-label mb-3">Активности</legend>
+              <div class="flex flex-wrap gap-2">
+                {
+                  corporate.activities.map((a) => (
+                    <label class="chip cursor-pointer select-none py-2 transition has-[:checked]:border-glow has-[:checked]:bg-deep has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-glow">
+                      <input type="checkbox" name="activities" value={a} data-label="Активности" class="sr-only" />
+                      {a}
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+            <div class="flex flex-wrap gap-x-6 gap-y-3">
+              <label class="check">
+                <input type="checkbox" name="banquet" value="нужен" data-label="Банкет" />
+                <span>Нужен банкет</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="stay" value="нужно" data-label="Размещение" />
+                <span>Нужно размещение</span>
+              </label>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <Field uid={uid} name="name" label="Имя" required error="Как к вам обращаться?" autocomplete="name" />
+              <Field uid={uid} name="phone" label="Телефон" type="tel" required error="Введите номер полностью: +7 (XXX) XXX-XX-XX" />
+            </div>
+            <Field uid={uid} name="comment" label="Комментарий" type="textarea" placeholder="Повод, бюджет, пожелания" />
+            <LeadFooter uid={uid} submit="Рассчитать корпоратив" />
+          </div>
+          <LeadSuccess text="Администратор свяжется с вами, предложит программу и пришлёт смету." />
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>

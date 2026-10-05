@@ -1,0 +1,223 @@
+---
+/**
+ * «Выбери свою трассу»: табы в фирменных цветах трасс + переключатель техники.
+ * Данные — src/data/prices.ts (snowmobileTracks, quadTracks).
+ */
+import { pricesMeta, quadTracks, snowmobileTracks, tracks, type TrackTariff } from '@/data/prices';
+import type { PhotoKey } from '@/data/photos';
+import type { ServiceId } from '@/data/types';
+import { href } from '@/lib/url';
+import BookButton from '../ui/BookButton.astro';
+import Footnote from '../ui/Footnote.astro';
+import Icon from '../ui/Icon.astro';
+import Pic from '../ui/Pic.astro';
+import PriceTag from '../ui/PriceTag.astro';
+import SectionHead from '../ui/SectionHead.astro';
+
+interface Props {
+  /** Показать только одну технику (на страницах услуг) */
+  only?: 'snow' | 'quad';
+  title?: string;
+  id?: string;
+}
+
+const { only, title = 'Выбери свою трассу', id = 'trassy' } = Astro.props;
+
+const order = ['white', 'green', 'red', 'black', 'individual'];
+const sortTracks = (list: TrackTariff[]) => [...list].sort((a, b) => order.indexOf(a.track) - order.indexOf(b.track));
+
+const vehicles: { key: 'snow' | 'quad'; label: string; icon: 'snowflake' | 'mountain'; service: ServiceId; path: string; photo: PhotoKey; list: TrackTariff[] }[] = [
+  { key: 'snow', label: 'Снегоход', icon: 'snowflake', service: 'snegokhod', path: '/snegokhod', photo: 'snow-blue-viking', list: sortTracks(snowmobileTracks) },
+  { key: 'quad', label: 'Квадроцикл', icon: 'mountain', service: 'kvadrotsikl', path: '/kvadrotsikl', photo: 'quad-grizzly-shore', list: sortTracks(quadTracks) },
+].filter((v) => !only || v.key === only) as never;
+
+const defaultVehicle = vehicles[0]!.key;
+const hasClarify = vehicles.some((v) => v.list.some((t) => t.durationClarify || t.variants.some((x) => x.clarify)));
+---
+
+<section id={id} class="slant bg-surface-grad" aria-labelledby={`${id}-title`}>
+  <div class="container-x">
+    <SectionHead
+      id={`${id}-title`}
+      eyebrow="Цветная система трасс"
+      title={title}
+      lead="Цвет трассы — это уровень: от пробного заезда до настоящего экстрима. Выберите свой."
+    />
+
+    <div class="mt-10" data-tabs data-track-picker>
+      {
+        vehicles.length > 1 && (
+          <div class="seg mb-6" role="tablist" aria-label="Техника" data-tablist>
+            {vehicles.map((v) => (
+              <button
+                type="button"
+                role="tab"
+                class="seg-btn"
+                id={`${id}-veh-${v.key}`}
+                aria-controls={`${id}-vp-${v.key}`}
+                aria-selected={v.key === defaultVehicle ? 'true' : 'false'}
+                tabindex={v.key === defaultVehicle ? 0 : -1}
+                data-tab-key={v.key}
+              >
+                <Icon name={v.icon} size={16} />
+                {v.label}
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        vehicles.map((v) => (
+          <div
+            id={`${id}-vp-${v.key}`}
+            role={vehicles.length > 1 ? 'tabpanel' : undefined}
+            aria-labelledby={vehicles.length > 1 ? `${id}-veh-${v.key}` : undefined}
+            data-active={v.key === defaultVehicle ? '' : undefined}
+          >
+            <div data-tabs>
+              <div
+                class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:flex-wrap md:px-0"
+                role="tablist"
+                aria-label={`Трассы: ${v.label.toLowerCase()}`}
+                data-tablist
+              >
+                {v.list.map((t) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    id={`${id}-${t.id}-tab`}
+                    aria-controls={`${id}-${t.id}`}
+                    aria-selected={t.track === 'red' ? 'true' : 'false'}
+                    tabindex={t.track === 'red' ? 0 : -1}
+                    data-tab-key={t.track}
+                    style={`--track:${tracks[t.track].color}`}
+                    class="group flex shrink-0 items-center gap-2.5 rounded-full border border-line bg-ink/60 px-4 py-2.5 text-sm font-bold text-muted transition hover:text-text aria-selected:border-[var(--track)] aria-selected:bg-[color-mix(in_srgb,var(--track)_16%,#05070D)] aria-selected:text-text aria-selected:shadow-[0_0_24px_-6px_var(--track)]"
+                  >
+                    <span class="track-dot" data-track={t.track} />
+                    {tracks[t.track].name}
+                  </button>
+                ))}
+              </div>
+
+              {v.list.map((t) => {
+                const meta = tracks[t.track];
+                const active = t.track === 'red';
+                return (
+                  <div
+                    id={`${id}-${t.id}`}
+                    role="tabpanel"
+                    aria-labelledby={`${id}-${t.id}-tab`}
+                    data-active={active ? '' : undefined}
+                    tabindex="0"
+                    class="mt-4"
+                  >
+                    <article
+                      class="card relative grid overflow-hidden md:grid-cols-[1.25fr_1fr]"
+                      style={`--track:${meta.color}`}
+                    >
+                      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_90%_at_0%_0%,color-mix(in_srgb,var(--track)_22%,transparent),transparent_70%)]" />
+                      <div class="absolute inset-y-0 left-0 w-1.5 bg-[var(--track)]" style={t.track === 'black' ? 'box-shadow: 1px 0 0 #fff' : undefined} />
+                      <div class="relative isolate overflow-hidden p-6 sm:p-8">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-3/5 opacity-30 [mask-image:linear-gradient(90deg,transparent,#000_70%)] md:block">
+                          <Pic photo={v.photo} sizes="30vw" widths={[480, 800]} alt="" />
+                        </div>
+                        <div class="relative flex flex-wrap items-center gap-3">
+                          <h3 class="font-display text-2xl font-extrabold sm:text-3xl">{t.title}</h3>
+                          {t.badge && <span class="chip chip-hot">{t.badge}</span>}
+                        </div>
+                        <div class="mt-3 flex items-center gap-3 text-sm text-muted">
+                          <span>Сложность</span>
+                          <span class="flex gap-1" role="img" aria-label={`Сложность ${meta.level} из 5`}>
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <span
+                                class="h-2 w-6 rounded-full"
+                                style={`background:${n <= meta.level ? meta.color : 'rgb(138 155 184 / 0.2)'};${t.track === 'black' && n <= meta.level ? 'box-shadow: inset 0 0 0 1px #fff' : ''}`}
+                              />
+                            ))}
+                          </span>
+                        </div>
+                        <p class="mt-5 text-lg font-semibold">{t.audience}</p>
+                        {t.sights.length > 0 && (
+                          <div class="mt-5">
+                            <p class="mb-2 text-xs font-bold uppercase tracking-widest text-muted">Что увидите</p>
+                            <ul class="flex flex-wrap gap-2">
+                              {t.sights.map((s) => (
+                                <li class="chip">{s}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {t.conditions && (
+                          <p class="mt-5 flex items-center gap-2 text-sm font-semibold text-[#ffb48a]">
+                            <Icon name="info" size={16} /> Условие: {t.conditions.join(', ')}
+                          </p>
+                        )}
+                      </div>
+
+                      <div class="relative flex flex-col gap-5 border-t border-line bg-ink/40 p-6 sm:p-8 md:border-l md:border-t-0">
+                        <dl class="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <dt class="text-muted">Длительность</dt>
+                            <dd class="mt-1 font-bold">
+                              {t.duration ?? 'уточняйте'}{t.durationClarify && <span class="clarify" title="Уточняйте у администратора">*</span>}
+                            </dd>
+                          </div>
+                          {(t.capacity || t.when) && (
+                            <div>
+                              <dt class="text-muted">{t.capacity ? 'Кто едет' : 'Когда'}</dt>
+                              <dd class="mt-1 font-bold">{t.capacity ?? t.when}</dd>
+                            </div>
+                          )}
+                          {t.capacity && t.when && (
+                            <div>
+                              <dt class="text-muted">Когда</dt>
+                              <dd class="mt-1 font-bold">{t.when}</dd>
+                            </div>
+                          )}
+                        </dl>
+
+                        <ul class="grid gap-3">
+                          {t.variants.map((x) => (
+                            <li class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface/80 p-4">
+                              <div>
+                                {x.tech && <p class="text-sm font-bold">{x.tech}</p>}
+                                {x.capacity && <p class="text-xs text-muted">{x.capacity}</p>}
+                                <p class="mt-0.5">
+                                  <PriceTag price={x.price} clarify={x.clarify} unit={x.unit} class="text-2xl" />
+                                </p>
+                                {x.note && <p class="text-xs text-muted">{x.note}</p>}
+                              </div>
+                              <BookButton service={v.service} program={x.id} size="sm" label="Выбрать" />
+                            </li>
+                          ))}
+                        </ul>
+                        <a href={href(v.path)} class="inline-flex items-center gap-2 text-sm font-bold text-glow hover:text-text">
+                          Подробнее о трассах <Icon name="arrow-right" size={16} />
+                        </a>
+                      </div>
+                    </article>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <p class="mt-6 text-sm text-muted">{pricesMeta.disclaimer}</p>
+    {hasClarify && <Footnote class="mt-1" />}
+  </div>
+</section>
+
+<script>
+  import { initTabs, selectTabByKey } from '@/scripts/tabs';
+  initTabs();
+  // Зимой по умолчанию — снегоход, в остальное время — квадроцикл
+  const picker = document.querySelector('[data-track-picker]');
+  const bySeason = (s: string | undefined) => (s === 'winter' ? 'snow' : 'quad');
+  if (picker) {
+    if (document.documentElement.dataset.season) selectTabByKey(picker, bySeason(document.documentElement.dataset.season));
+    document.addEventListener('season:change', (e) => selectTabByKey(picker, bySeason((e as CustomEvent<string>).detail)));
+  }
+</script>

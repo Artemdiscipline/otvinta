@@ -1,0 +1,19 @@
+---
+/** Стилизованный плейсхолдер, если реального фото пока нет (см. TODO.md). */
+import type { IconName } from '@/data/types';
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: IconName;
+  label?: string;
+  class?: string;
+}
+const { icon, label = 'фото клуба', class: className } = Astro.props;
+---
+
+<div class:list={['blueprint relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden text-glow', className]} role="img" aria-label={label}>
+  <span class="grid size-16 place-items-center rounded-2xl border border-glow/30 bg-ink/50 shadow-[0_0_30px_-6px_rgb(30_144_255/0.8)]">
+    <Icon name={icon} size={30} />
+  </span>
+  <span class="text-xs font-bold uppercase tracking-[0.2em] text-muted">{label}</span>
+</div>

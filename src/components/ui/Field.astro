@@ -1,0 +1,73 @@
+---
+/** Поле формы заявки с подписью, ошибкой и data-label для текста заявки. */
+interface Props {
+  uid: string;
+  name: string;
+  label: string;
+  type?: 'text' | 'tel' | 'date' | 'number' | 'select' | 'textarea' | 'email';
+  required?: boolean;
+  error?: string;
+  placeholder?: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+  value?: string;
+  autocomplete?: string;
+  class?: string;
+  rows?: number;
+}
+const {
+  uid,
+  name,
+  label,
+  type = 'text',
+  required = false,
+  error,
+  placeholder,
+  options = [],
+  min,
+  max,
+  value,
+  autocomplete,
+  class: className,
+  rows = 3,
+} = Astro.props;
+const id = `${uid}-${name}`;
+const errId = `${id}-error`;
+const common = {
+  id,
+  name,
+  class: 'input',
+  required,
+  'data-label': label,
+  'data-error': error ?? (required ? 'Заполните поле' : undefined),
+  'aria-describedby': error || required ? errId : undefined,
+};
+const extra =
+  type === 'tel'
+    ? { inputmode: 'tel' as const, autocomplete: 'tel', placeholder: '+7 (___) ___-__-__', 'data-phone': '' }
+    : type === 'date'
+      ? { 'data-future': '' }
+      : type === 'number'
+        ? { inputmode: 'numeric' as const }
+        : {};
+---
+
+<div class:list={['field', className]}>
+  <label class="field-label" for={id}>{label}{required && <span class="req" aria-hidden="true"> *</span>}</label>
+  {
+    type === 'select' ? (
+      <select {...common}>
+        <option value="">Выберите</option>
+        {options.map((o) => (
+          <option value={o}>{o}</option>
+        ))}
+      </select>
+    ) : type === 'textarea' ? (
+      <textarea {...common} rows={rows} placeholder={placeholder} maxlength="800" />
+    ) : (
+      <input {...common} {...extra} type={type} placeholder={placeholder ?? (extra as { placeholder?: string }).placeholder} min={min} max={max} value={value} autocomplete={autocomplete ?? (extra as { autocomplete?: string }).autocomplete} />
+    )
+  }
+  {(error || required) && <p class="field-error" id={errId} aria-live="polite" />}
+</div>

@@ -1,0 +1,28 @@
+---
+import { locations } from '@/data/site';
+import Footnote from '../ui/Footnote.astro';
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import LocationCard from './LocationCard.astro';
+import MapEmbed from './MapEmbed.astro';
+---
+
+<section id="gde-my" class="section" aria-labelledby="where-title">
+  <div class="container-x">
+    <SectionHead
+      id="where-title"
+      eyebrow="Где мы"
+      title="Две площадки — не перепутайте"
+      lead="Снег и бездорожье — в Мирном, вода — на Волге в Боровом Матюшине. Это разные места, сверьтесь с адресом перед выездом."
+    />
+    <div class="reveal mt-6 flex items-start gap-3 rounded-2xl border border-hot/40 bg-hot/10 p-4 text-sm">
+      <Icon name="info" size={20} class="mt-0.5 shrink-0 text-hot" />
+      <p>Перед выездом проверьте, куда вам: <b>снегоходы и квадроциклы</b> — посёлок Мирный, <b>гидроциклы и флайборд</b> — Боровое Матюшино.</p>
+    </div>
+    <div class="mt-8 grid gap-5 lg:grid-cols-2">
+      {locations.map((l, i) => <LocationCard loc={l} index={i} />)}
+    </div>
+    <MapEmbed points={locations} class="reveal mt-5 h-[22rem] sm:h-[26rem]" />
+    <Footnote class="mt-3" />
+  </div>
+</section>

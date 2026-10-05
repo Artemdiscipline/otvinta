@@ -1,0 +1,63 @@
+---
+/**
+ * Яндекс.Карта по клику: до клика — лёгкая заглушка без сторонних запросов.
+ * Используется виджет map-widget (без ключа API) с метками площадок клуба.
+ */
+import type { Location } from '@/data/site';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  points: Location[];
+  zoom?: number;
+  class?: string;
+}
+const { points, zoom, class: className } = Astro.props;
+const lon = points.reduce((s, p) => s + p.geo.lon, 0) / points.length;
+const lat = points.reduce((s, p) => s + p.geo.lat, 0) / points.length;
+const z = zoom ?? (points.length > 1 ? 11 : 14);
+const colors = ['blm', 'orm'];
+const pt = points.map((p, i) => `${p.geo.lon},${p.geo.lat},pm2${colors[i % 2]}${points.length > 1 ? i + 1 : ''}`).join('~');
+const src = `https://yandex.ru/map-widget/v1/?ll=${lon.toFixed(6)},${lat.toFixed(6)}&z=${z}&pt=${pt}&l=map`;
+const title = points.length > 1 ? 'Карта: площадки клуба «От винта»' : `Карта: ${points[0]!.title}`;
+---
+
+<div class:list={['map-embed blueprint relative overflow-hidden rounded-3xl border border-line', className]} data-map-src={src} data-map-title={title}>
+  <div class="absolute inset-0">
+    <svg class="absolute inset-0 h-full w-full opacity-40" preserveAspectRatio="none" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M-5 70 C 20 60, 30 80, 55 62 S 90 40, 105 46" stroke="#1E90FF" stroke-width="5" fill="none" opacity=".5"></path>
+      <path d="M-5 70 C 20 60, 30 80, 55 62 S 90 40, 105 46" stroke="#4FB3FF" stroke-width=".6" fill="none"></path>
+    </svg>
+    {
+      points.map((p, i) => (
+        <div
+          class="absolute flex -translate-x-1/2 -translate-y-full flex-col items-center gap-1"
+          style={points.length > 1 ? `left:${i === 0 ? 66 : 34}%;top:${i === 0 ? 40 : 66}%` : 'left:50%;top:50%'}
+        >
+          <span class:list={['chip whitespace-nowrap bg-ink/80 text-xs', i === 1 && 'chip-hot']}>{p.short}</span>
+          <Icon name="map-pin" size={34} class={i === 1 ? 'text-hot' : 'text-glow'} />
+        </div>
+      ))
+    }
+  </div>
+  <button
+    type="button"
+    class="btn btn-blue absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap"
+    data-map-load
+  >
+    <Icon name="map-pin" size={18} /> Показать карту
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.map-embed').forEach((box) => {
+    box.querySelector('[data-map-load]')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = box.dataset.mapSrc ?? '';
+      iframe.title = box.dataset.mapTitle ?? 'Карта';
+      iframe.loading = 'lazy';
+      iframe.allowFullscreen = true;
+      iframe.className = 'absolute inset-0 h-full w-full border-0';
+      box.replaceChildren(iframe);
+    });
+  });
+</script>

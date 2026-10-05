@@ -1,0 +1,76 @@
+---
+/** Карточки трасс сеткой — для страниц снегоходов и квадроциклов. */
+import { tracks, type TrackTariff } from '@/data/prices';
+import type { ServiceId } from '@/data/types';
+import BookButton from '../ui/BookButton.astro';
+import Icon from '../ui/Icon.astro';
+import PriceTag from '../ui/PriceTag.astro';
+
+interface Props {
+  list: TrackTariff[];
+  service: ServiceId;
+}
+const { list, service } = Astro.props;
+---
+
+<ul class:list={['grid gap-4 sm:grid-cols-2', list.length === 4 ? 'xl:grid-cols-4' : 'lg:grid-cols-3 xl:grid-cols-5']}>
+  {
+    list.map((t, i) => {
+      const m = tracks[t.track];
+      return (
+        <li class="reveal" style={`--d:${i * 70}ms`}>
+          <article class="card card-hover relative flex h-full flex-col overflow-hidden p-5" style={`--track:${m.color}`}>
+            <div class="absolute inset-x-0 top-0 h-1.5 bg-[var(--track)]" style={t.track === 'black' ? 'box-shadow: 0 1px 0 #fff' : undefined} />
+            <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_0%,color-mix(in_srgb,var(--track)_14%,transparent),transparent_70%)]" />
+            <div class="relative flex items-center justify-between gap-2">
+              <span class="flex items-center gap-2 text-sm font-bold">
+                <span class="track-dot" data-track={t.track} />
+                {m.name}
+              </span>
+              {t.badge && <span class="chip chip-hot !py-0.5 text-xs">{t.badge}</span>}
+            </div>
+            <h3 class="relative mt-4 font-display text-lg font-bold">{t.title}</h3>
+            <p class="relative mt-2 text-sm text-muted">{t.audience}</p>
+            <dl class="relative mt-4 grid gap-2 text-sm">
+              <div class="flex items-center gap-2">
+                <dt><Icon name="timer" size={16} class="text-glow" /><span class="sr-only">Длительность</span></dt>
+                <dd>{t.duration ?? 'длительность уточняйте'}{t.durationClarify && <span class="clarify" title="Уточняйте у администратора">*</span>}</dd>
+              </div>
+              {t.capacity && (
+                <div class="flex items-center gap-2">
+                  <dt><Icon name="users" size={16} class="text-glow" /><span class="sr-only">Кто едет</span></dt>
+                  <dd>{t.capacity}</dd>
+                </div>
+              )}
+              {t.conditions && (
+                <div class="flex items-center gap-2 text-[#ffb48a]">
+                  <dt><Icon name="info" size={16} /><span class="sr-only">Условие</span></dt>
+                  <dd>{t.conditions.join(', ')}</dd>
+                </div>
+              )}
+            </dl>
+            {t.sights.length > 0 && (
+              <ul class="relative mt-4 flex flex-wrap gap-1.5">
+                {t.sights.map((s) => (
+                  <li class="chip !px-2.5 !py-1 text-xs">{s}</li>
+                ))}
+              </ul>
+            )}
+            <div class="relative mt-auto grid gap-3 pt-5">
+              {t.variants.map((v) => (
+                <div class="flex items-end justify-between gap-2 border-t border-line pt-3">
+                  <div>
+                    {v.tech && <p class="text-xs font-bold text-muted">{v.tech}</p>}
+                    <PriceTag price={v.price} clarify={v.clarify} class="text-xl" />
+                    {v.unit && <p class="text-xs text-muted">{v.unit}</p>}
+                  </div>
+                  <BookButton service={service} program={v.id} size="sm" label="Бронь" icon={false} />
+                </div>
+              ))}
+            </div>
+          </article>
+        </li>
+      );
+    })
+  }
+</ul>

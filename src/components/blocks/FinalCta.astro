@@ -1,0 +1,59 @@
+---
+/** Финальный призыв с формой заявки прямо на странице. */
+import { phones, site, socials } from '@/data/site';
+import type { ServiceId } from '@/data/types';
+import { telHref } from '@/lib/format';
+import Icon from '../ui/Icon.astro';
+import BookingForm from './BookingForm.astro';
+
+interface Props {
+  service?: ServiceId;
+  title?: string;
+  lead?: string;
+}
+const {
+  service,
+  title = 'Навстречу приключениям!',
+  lead = 'Оставьте заявку — администратор подберёт трассу или программу под вашу компанию и время.',
+} = Astro.props;
+---
+
+<section id="zayavka" class="slant-top relative overflow-hidden bg-surface pb-20 md:pb-28" aria-labelledby="cta-title">
+  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_0%_100%,rgb(10_77_255/0.35),transparent_70%),radial-gradient(50%_50%_at_100%_0%,rgb(255_106_26/0.12),transparent_70%)]"></div>
+  <div class="container-x relative grid gap-10 lg:grid-cols-[0.9fr_1.3fr]">
+    <div class="reveal">
+      <p class="eyebrow mb-3">Бронирование</p>
+      <h2 id="cta-title" class="h-section">{title}</h2>
+      <p class="lead mt-4">{lead}</p>
+      <ul class="mt-8 grid gap-3">
+        {
+          phones.map((p) => (
+            <li>
+              <a href={telHref(p.e164)} class="inline-flex items-center gap-3 text-lg font-extrabold hover:text-glow">
+                <Icon name="phone" size={18} class="text-glow" />
+                {p.display}
+              </a>
+              {p.note && <span class="ml-2 text-sm text-muted">{p.note}</span>}
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-6 flex flex-wrap gap-2">
+        {
+          socials.map((s) => (
+            <a href={s.url} target="_blank" rel="noopener" class="chip py-2 hover:border-glow">
+              <Icon name={s.icon} size={18} /> {s.label}
+            </a>
+          ))
+        }
+      </div>
+      <p class="mt-8 flex items-start gap-3 text-sm text-muted">
+        <Icon name="clock" size={18} class="mt-0.5 shrink-0 text-glow" />
+        Приезжайте {site.arriveBefore}: переодеться и пройти инструктаж. На выходные бронируйте заранее.
+      </p>
+    </div>
+    <div class="reveal card p-5 sm:p-8" style="--d:120ms">
+      <BookingForm uid={`cta-${service ?? 'all'}`} service={service} />
+    </div>
+  </div>
+</section>

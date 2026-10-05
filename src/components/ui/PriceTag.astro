@@ -1,0 +1,16 @@
+---
+/** Цена из src/data + ненавязчивая сноска «уточняйте у администратора», если значение спорное. */
+import type { Price } from '@/data/types';
+import { formatPrice } from '@/lib/format';
+
+interface Props {
+  price: Price;
+  clarify?: boolean;
+  unit?: string;
+  class?: string;
+}
+
+const { price, clarify = false, unit, class: className } = Astro.props;
+---
+
+<span class:list={['price', className]}>{formatPrice(price)}{clarify && <span class="clarify" title="Уточняйте у администратора">*<span class="sr-only"> — уточняйте у администратора</span></span>}</span>{unit && <span class="ml-1 text-sm font-semibold text-muted">{unit}</span>}

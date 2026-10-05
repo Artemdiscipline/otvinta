@@ -1,0 +1,195 @@
+---
+/**
+ * Форма «Заявка на заезд». Используется в модалке и в блоках на страницах.
+ * Логика — src/scripts/lead.ts (валидация, маска телефона, отправка в мессенджер)
+ * и src/scripts/booking.ts (зависимый список программ).
+ */
+import { bookingServices } from '@/data/booking';
+import { pages } from '@/data/pages';
+import { site } from '@/data/site';
+import type { ServiceId } from '@/data/types';
+import { href } from '@/lib/url';
+import Icon from '../ui/Icon.astro';
+import LeadSuccess from './LeadSuccess.astro';
+
+interface Props {
+  uid: string;
+  service?: ServiceId;
+  compact?: boolean;
+}
+
+const { uid, service } = Astro.props;
+const f = (name: string) => `${uid}-${name}`;
+---
+
+<form
+  class="lead-form grid gap-4"
+  novalidate
+  data-lead-form
+  data-booking-form
+  data-lead-title="Заявка на заезд с сайта «От винта»"
+  data-default-service={service}
+  aria-describedby={f('hint')}
+>
+  <div class="lead-fields grid gap-4">
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="field">
+        <label class="field-label" for={f('name')}>Имя <span class="req" aria-hidden="true">*</span></label>
+        <input
+          class="input"
+          id={f('name')}
+          name="name"
+          type="text"
+          autocomplete="name"
+          required
+          maxlength="60"
+          data-label="Имя"
+          data-error="Как к вам обращаться?"
+          aria-describedby={f('name-error')}
+        />
+        <p class="field-error" id={f('name-error')} aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label class="field-label" for={f('phone')}>Телефон <span class="req" aria-hidden="true">*</span></label>
+        <input
+          class="input"
+          id={f('phone')}
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="+7 (___) ___-__-__"
+          required
+          data-phone
+          data-label="Телефон"
+          data-error="Введите номер полностью: +7 (XXX) XXX-XX-XX"
+          aria-describedby={f('phone-error')}
+        />
+        <p class="field-error" id={f('phone-error')} aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="field">
+        <label class="field-label" for={f('service')}>Услуга <span class="req" aria-hidden="true">*</span></label>
+        <select
+          class="input"
+          id={f('service')}
+          name="service"
+          required
+          data-service-select
+          data-label="Услуга"
+          data-error="Выберите услугу"
+          aria-describedby={f('service-error')}
+        >
+          <option value="">Выберите услугу</option>
+          {bookingServices.map((s) => <option value={s.id} selected={s.id === service}>{s.label}</option>)}
+        </select>
+        <p class="field-error" id={f('service-error')} aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label class="field-label" for={f('program')} data-program-label>Трасса / программа</label>
+        <select class="input" id={f('program')} name="program" data-program-select data-label="Программа">
+          <option value="">Сначала выберите услугу</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div class="field col-span-2 sm:col-span-1">
+        <label class="field-label" for={f('date')}>Дата <span class="req" aria-hidden="true">*</span></label>
+        <input
+          class="input"
+          id={f('date')}
+          name="date"
+          type="date"
+          required
+          data-future
+          data-label="Дата"
+          data-error="Выберите дату не раньше сегодняшней"
+          aria-describedby={f('date-error')}
+        />
+        <p class="field-error" id={f('date-error')} aria-live="polite"></p>
+      </div>
+      <div class="field col-span-1">
+        <label class="field-label" for={f('time')}>Время</label>
+        <input class="input" id={f('time')} name="time" type="time" step="900" data-label="Время" />
+      </div>
+      <div class="field col-span-1">
+        <label class="field-label" for={f('people')}>Человек</label>
+        <input
+          class="input"
+          id={f('people')}
+          name="people"
+          type="number"
+          min="1"
+          max="400"
+          value="2"
+          inputmode="numeric"
+          data-label="Человек"
+          data-error="От 1 до 400 человек"
+          aria-describedby={f('people-error')}
+        />
+        <p class="field-error" id={f('people-error')} aria-live="polite"></p>
+      </div>
+    </div>
+
+    <label class="check">
+      <input type="checkbox" name="kids" value="да" data-label="Дети до 5 лет" />
+      <span>С нами будут дети до 5 лет</span>
+    </label>
+
+    <div class="field">
+      <label class="field-label" for={f('comment')}>Комментарий</label>
+      <textarea
+        class="input"
+        id={f('comment')}
+        name="comment"
+        rows="3"
+        maxlength="800"
+        placeholder="Модель техники, пожелания по маршруту, вопросы"
+        data-label="Комментарий"
+        data-comment></textarea>
+    </div>
+
+    <fieldset class="grid gap-2">
+      <legend class="field-label mb-2">Куда отправить заявку</legend>
+      <div class="seg w-full sm:w-auto">
+        <label class="seg-btn flex-1 justify-center has-[:checked]:bg-deep has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-glow">
+          <input type="radio" name="channel" value="whatsapp" checked class="sr-only" />
+          <Icon name="whatsapp" size={18} /> WhatsApp
+        </label>
+        <label class="seg-btn flex-1 justify-center has-[:checked]:bg-deep has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-glow">
+          <input type="radio" name="channel" value="telegram" class="sr-only" />
+          <Icon name="telegram" size={18} /> Telegram
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <label class="check">
+        <input
+          type="checkbox"
+          name="consent"
+          required
+          data-error="Нужно согласие на обработку персональных данных"
+          aria-describedby={f('consent-error')}
+        />
+        <span>
+          Согласен(на) на обработку персональных данных по
+          <a href={href(pages.privacy.path)} class="text-glow underline underline-offset-2 hover:text-text" target="_blank">политике конфиденциальности</a>
+        </span>
+      </label>
+      <p class="field-error" id={f('consent-error')} aria-live="polite"></p>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <button type="submit" class="btn btn-hot btn-lg w-full shrink-0 whitespace-nowrap sm:w-auto">
+        Отправить заявку <Icon name="send" size={18} />
+      </button>
+      <p class="text-sm text-muted" id={f('hint')}>Ответим в мессенджере. Приезжайте {site.arriveBefore}.</p>
+    </div>
+  </div>
+
+  <LeadSuccess />
+</form>

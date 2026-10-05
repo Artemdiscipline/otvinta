@@ -1,0 +1,164 @@
+---
+import Faq from '@/components/blocks/Faq.astro';
+import FinalCta from '@/components/blocks/FinalCta.astro';
+import Gallery from '@/components/blocks/Gallery.astro';
+import Promos from '@/components/blocks/Promos.astro';
+import TrackCards from '@/components/blocks/TrackCards.astro';
+import TrackTable from '@/components/blocks/TrackTable.astro';
+import Videos from '@/components/blocks/Videos.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import BookButton from '@/components/ui/BookButton.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Pic from '@/components/ui/Pic.astro';
+import PriceTag from '@/components/ui/PriceTag.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import { faqFor } from '@/data/faq';
+import { pages } from '@/data/pages';
+import { minPrice, snowmobileIncluded, snowmobileTech, snowmobileTracks } from '@/data/prices';
+import { promos, promosFor } from '@/data/promos';
+import { location } from '@/data/site';
+import { videos } from '@/data/videos';
+import Base from '@/layouts/Base.astro';
+import { formatPrice } from '@/lib/format';
+import { servicePageLd } from '@/lib/schema';
+
+const meta = pages.snegokhod;
+const origin = String(Astro.site);
+const loc = location('mirny');
+const friday = promos.find((p) => p.id === 'friday')!;
+const order = ['white', 'green', 'red', 'black', 'individual'];
+const list = [...snowmobileTracks].sort((a, b) => order.indexOf(a.track) - order.indexOf(b.track));
+const red = snowmobileTracks.find((t) => t.track === 'red')!;
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  path={meta.path}
+  jsonLd={servicePageLd(origin, { name: 'Прокат снегоходов', path: meta.path, crumb: meta.crumb, serviceId: 'snegokhod', location: 'mirny' })}
+>
+  <PageHero
+    photo="snow-sunset"
+    eyebrow="Зимний сезон · Мирный"
+    title="Прокат снегоходов в Казани"
+    lead="Не просто аренда снегохода, а полноценное зимнее приключение: от спокойных семейных прогулок до экстремальных заездов по сложным трассам."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    service="snegokhod"
+    facts={[
+      { icon: 'ticket', label: 'Стоимость', value: formatPrice(minPrice('snegokhod')) },
+      { icon: 'route', label: 'Трасс', value: `${snowmobileTracks.length} уровней` },
+      { icon: 'baby', label: 'Дети', value: 'с 2 лет пассажиром' },
+      { icon: 'map-pin', label: 'Где', value: `${loc.short}, база «Динамо»` },
+    ]}
+    secondary={{ label: 'Сравнить трассы', href: '#tarify', icon: 'route' }}
+  />
+
+  <section class="section" aria-labelledby="about-title">
+    <div class="container-x grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class="reveal">
+        <p class="eyebrow mb-3">Как это устроено</p>
+        <h2 id="about-title" class="h-section">Зима в лесу, а не на парковке</h2>
+        <p class="lead mt-4">
+          Катаем по самым живописным местам вокруг Казани: хвойный лес, поля, ущелья, болота с камышом и берег Волги.
+          Каждый найдёт свой формат — от пробного заезда до экстремальной Чёрной трассы.
+        </p>
+        <p class="mt-6 text-sm font-bold uppercase tracking-widest text-muted">В стоимость включено</p>
+        <ul class="ticks mt-3">
+          {snowmobileIncluded.map((i) => <li class="first-letter:uppercase">{i}</li>)}
+          <li>инструктаж перед заездом</li>
+        </ul>
+      </div>
+      <div class="reveal grid grid-cols-2 gap-3" style="--d:120ms">
+        <div class="photo-shade relative aspect-[3/4] overflow-hidden rounded-3xl border border-line">
+          <Pic photo="snow-forest-track" sizes="(min-width: 1024px) 25vw, 50vw" widths={[400, 700]} />
+        </div>
+        <div class="photo-shade relative mt-10 aspect-[3/4] overflow-hidden rounded-3xl border border-line">
+          <Pic photo="snow-couple" sizes="(min-width: 1024px) 25vw, 50vw" widths={[400, 700]} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tarify" class="slant bg-surface-grad" aria-labelledby="tarify-title">
+    <div class="container-x">
+      <SectionHead
+        id="tarify-title"
+        eyebrow="Тарифы"
+        title="Сравните трассы"
+        lead="Цвет — уровень сложности. Самая популярная — Красная: хвойный лес, ущелья и берег Волги, днём и вечером."
+      />
+      <div class="mt-10">
+        <TrackTable list={list} service="snegokhod" caption="Тарифы на снегоходы" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tracks-title">
+    <div class="container-x">
+      <SectionHead id="tracks-title" eyebrow="Пять трасс" title="Что увидите на каждой трассе" />
+      <div class="mt-10">
+        <TrackCards list={list} service="snegokhod" />
+      </div>
+    </div>
+  </section>
+
+  <section class="slant bg-surface-grad" aria-labelledby="tech-title">
+    <div class="container-x grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div class="reveal photo-shade relative aspect-[4/5] overflow-hidden rounded-3xl border border-line sm:aspect-[4/3] lg:aspect-[4/5]">
+        <Pic photo="snow-blue-viking" sizes="(min-width: 1024px) 45vw, 100vw" widths={[480, 800, 1000]} />
+        <p class="absolute bottom-5 left-5 right-5 z-10 text-sm text-text/90">
+          Yamaha VK540 из парка клуба
+        </p>
+      </div>
+      <div class="reveal" style="--d:120ms">
+        <p class="eyebrow mb-3">Техника</p>
+        <h2 id="tech-title" class="h-section">{snowmobileTech.model}</h2>
+        <p class="lead mt-4">
+          Японские снегоходы Yamaha — не китайские аналоги. Удобные, тёплые и устойчивые: на одном едут двое взрослых и ребёнок. Например, {snowmobileTech.example.color} {snowmobileTech.example.name} — о нём пишут гости в отзывах.
+        </p>
+        <ul class="mt-8 grid gap-3 sm:grid-cols-2">
+          {
+            snowmobileTech.features.map((f) => (
+              <li class="card flex items-center gap-3 p-4">
+                <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-deep/25 text-glow ring-1 ring-glow/30">
+                  <Icon name={f.icon} size={22} />
+                </span>
+                <span class="font-bold">{f.title}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="friday-title">
+    <div class="container-x">
+      <div class="reveal relative overflow-hidden rounded-3xl border border-hot/50 bg-[linear-gradient(120deg,rgb(255_106_26/0.22),rgb(12_18_32)_55%)] p-6 sm:p-10">
+        <div class="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <span class="chip chip-hot">{friday.tag} · каждую пятницу</span>
+            <h2 id="friday-title" class="mt-4 font-display text-[clamp(1.6rem,1rem+2.5vw,2.8rem)] font-extrabold">{friday.title}</h2>
+            <p class="mt-3 max-w-xl text-text/85">{friday.text}</p>
+            <p class="mt-3 text-sm text-muted">
+              Красная трасса: <PriceTag price={red.variants[0]!.price} class="text-sm" /> {red.variants[0]!.unit}
+            </p>
+          </div>
+          <BookButton
+            service="snegokhod"
+            program="snow-red"
+            label="Забронировать пятницу"
+            size="lg"
+            comment="Хочу вечерний семейный заезд в пятницу (скидка 20%), 18:00 или 19:00"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Promos items={promosFor('snegokhod').filter((p) => p.id !== 'friday')} title="Бонусы гостям трасс" />
+  <Gallery photos={['snow-sunset', 'snow-forest-track', 'snow-orange-viking', 'snow-blue-viking', 'snow-couple']} title="Снегоходные экскурсии" />
+  <Videos items={videos.filter((v) => v.provider === 'rutube' && v.services.includes('snegokhod'))} title="Трассы на видео" />
+  <Faq items={faqFor('snegokhod')} title="Вопросы о снегоходах" />
+  <FinalCta service="snegokhod" title="Забронируйте снегоход" />
+</Base>

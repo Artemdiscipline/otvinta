@@ -1,0 +1,37 @@
+---
+/** Модалка «Заявка на заезд» — открывается с любой кнопки [data-book]. */
+import { mainPhone } from '@/data/site';
+import { telHref } from '@/lib/format';
+import Icon from '../ui/Icon.astro';
+import BookingForm from './BookingForm.astro';
+---
+
+<dialog id="booking" class="modal" aria-labelledby="booking-title">
+  <div class="flex min-h-full items-end justify-center sm:items-center sm:p-6" data-modal-backdrop>
+    <div
+      class="modal-panel relative w-full max-w-2xl overflow-hidden rounded-t-3xl border border-line bg-surface shadow-glow sm:rounded-3xl"
+    >
+      <div class="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-deep/30 blur-3xl"></div>
+      <div class="relative max-h-[92dvh] overflow-y-auto p-5 sm:p-8">
+        <div class="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p class="eyebrow mb-2">Онлайн-бронирование</p>
+            <h2 id="booking-title" class="font-display text-2xl font-extrabold sm:text-3xl">Заявка на заезд</h2>
+            <p class="mt-2 text-sm text-muted">
+              Или позвоните: <a class="font-bold text-text hover:text-glow" href={telHref(mainPhone.e164)}>{mainPhone.display}</a>
+            </p>
+          </div>
+          <button
+            type="button"
+            class="grid size-11 shrink-0 place-items-center rounded-full border border-line text-text transition hover:border-glow hover:shadow-glow-sm"
+            data-modal-close
+            aria-label="Закрыть"
+          >
+            <Icon name="x" />
+          </button>
+        </div>
+        <BookingForm uid="bk" />
+      </div>
+    </div>
+  </div>
+</dialog>

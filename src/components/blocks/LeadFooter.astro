@@ -1,0 +1,41 @@
+---
+/** Общий низ форм: канал отправки, согласие на обработку ПД, кнопка. */
+import { pages } from '@/data/pages';
+import { href } from '@/lib/url';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  uid: string;
+  submit?: string;
+}
+const { uid, submit = 'Отправить заявку' } = Astro.props;
+---
+
+<fieldset class="grid gap-2">
+  <legend class="field-label mb-2">Куда отправить заявку</legend>
+  <div class="seg w-full sm:w-auto">
+    <label class="seg-btn flex-1 justify-center has-[:checked]:bg-deep has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-glow">
+      <input type="radio" name="channel" value="whatsapp" checked class="sr-only" />
+      <Icon name="whatsapp" size={18} /> WhatsApp
+    </label>
+    <label class="seg-btn flex-1 justify-center has-[:checked]:bg-deep has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-glow">
+      <input type="radio" name="channel" value="telegram" class="sr-only" />
+      <Icon name="telegram" size={18} /> Telegram
+    </label>
+  </div>
+</fieldset>
+
+<div class="field">
+  <label class="check">
+    <input type="checkbox" name="consent" required data-error="Нужно согласие на обработку персональных данных" aria-describedby={`${uid}-consent-error`} />
+    <span>
+      Согласен(на) на обработку персональных данных по
+      <a href={href(pages.privacy.path)} class="text-glow underline underline-offset-2 hover:text-text" target="_blank">политике конфиденциальности</a>
+    </span>
+  </label>
+  <p class="field-error" id={`${uid}-consent-error`} aria-live="polite"></p>
+</div>
+
+<button type="submit" class="btn btn-hot btn-lg w-full whitespace-nowrap sm:w-auto sm:justify-self-start">
+  {submit} <Icon name="send" size={18} />
+</button>

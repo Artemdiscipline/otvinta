@@ -1,0 +1,96 @@
+---
+/** Первый экран внутренних страниц: фото, хлебные крошки, H1, быстрые факты, CTA. */
+import type { PhotoKey } from '@/data/photos';
+import type { IconName, ServiceId } from '@/data/types';
+import { HERO_WIDTHS } from '@/lib/images';
+import BookButton from '../ui/BookButton.astro';
+import Breadcrumbs from '../ui/Breadcrumbs.astro';
+import Icon from '../ui/Icon.astro';
+import Pic from '../ui/Pic.astro';
+
+interface Props {
+  photo?: PhotoKey;
+  title: string;
+  lead?: string;
+  eyebrow?: string;
+  crumbs: { name: string; path: string }[];
+  facts?: { icon: IconName; label: string; value: string; clarify?: boolean }[];
+  service?: ServiceId;
+  cta?: string | false;
+  secondary?: { label: string; href: string; icon?: IconName };
+  compact?: boolean;
+}
+
+const { photo, title, lead, eyebrow, crumbs, facts = [], service, cta = 'Забронировать', secondary, compact = false } = Astro.props;
+---
+
+<section
+  class:list={[
+    'relative isolate flex overflow-hidden pt-[calc(var(--header-h)+1.5rem)]',
+    compact ? 'min-h-[22rem] items-end pb-12 md:min-h-[26rem]' : 'min-h-[88svh] items-end pb-12 md:min-h-[44rem] md:pb-16',
+  ]}
+  aria-labelledby="page-title"
+>
+  {
+    photo ? (
+      <div class="absolute inset-0 -z-20" data-parallax>
+        <Pic photo={photo} sizes="100vw" widths={HERO_WIDTHS} priority class="h-[112%] w-full object-cover" />
+      </div>
+    ) : (
+      <div class="blueprint absolute inset-0 -z-20" />
+    )
+  }
+  <div class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(5_7_13/0.6)_0%,rgb(5_7_13/0.35)_40%,rgb(5_7_13/0.95)_100%),radial-gradient(80%_70%_at_10%_80%,rgb(5_7_13/0.7),transparent_70%),radial-gradient(60%_60%_at_90%_10%,rgb(10_77_255/0.35),transparent_70%)]"></div>
+  <div class="grain pointer-events-none absolute inset-0 -z-10"></div>
+
+  <div class="container-x relative">
+    <Breadcrumbs trail={crumbs} />
+    {eyebrow && <p class="eyebrow mt-6">{eyebrow}</p>}
+    <h1
+      id="page-title"
+      class:list={[
+        'max-w-4xl font-display leading-[1.05] font-extrabold tracking-tight',
+        eyebrow ? 'mt-3' : 'mt-6',
+        compact ? 'text-[clamp(1.8rem,1.1rem+3vw,3.4rem)]' : 'text-[clamp(2rem,1.1rem+4vw,4.2rem)]',
+      ]}
+    >
+      {title}
+    </h1>
+    {lead && <p class="mt-5 max-w-2xl text-lg text-text/85">{lead}</p>}
+
+    {
+      facts.length > 0 && (
+        <ul class="mt-7 grid max-w-4xl grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+          {facts.map((f) => (
+            <li class="flex items-center gap-3 rounded-2xl border border-line bg-ink/60 px-4 py-3">
+              <Icon name={f.icon} size={20} class="shrink-0 text-glow" />
+              <div>
+                <span class="block text-[0.7rem] font-bold uppercase tracking-widest text-muted">{f.label}</span>
+                <span class="block font-bold">{f.value}{f.clarify && <span class="clarify" title="Уточняйте у администратора">*</span>}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      (cta || secondary) && (
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          {cta && <BookButton service={service} label={cta} size="lg" />}
+          {secondary && (
+            <a href={secondary.href} class="btn btn-ghost btn-lg">
+              {secondary.label}
+              <Icon name={secondary.icon ?? 'arrow-right'} size={18} />
+            </a>
+          )}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  import { initParallax } from '@/scripts/parallax';
+  initParallax();
+</script>

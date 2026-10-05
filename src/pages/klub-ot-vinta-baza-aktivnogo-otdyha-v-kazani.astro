@@ -1,0 +1,70 @@
+---
+import Advantages from '@/components/blocks/Advantages.astro';
+import FinalCta from '@/components/blocks/FinalCta.astro';
+import ServiceCards from '@/components/blocks/ServiceCards.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import { base } from '@/data/offers';
+import { pages } from '@/data/pages';
+import { site } from '@/data/site';
+import Base from '@/layouts/Base.astro';
+import { servicePageLd } from '@/lib/schema';
+
+const meta = pages.base;
+const origin = String(Astro.site);
+const groups = [
+  { id: 'land', title: 'На базе', lead: 'Отдых после заездов и праздники на природе.', items: base.land },
+  { id: 'water', title: 'На воде', lead: 'Летние развлечения на Волге.', items: base.water },
+  { id: 'moto', title: 'Мототехника', lead: 'Эндуро и мотоциклы — в прокате клуба.', items: base.moto },
+];
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  path={meta.path}
+  jsonLd={servicePageLd(origin, { name: 'База активного отдыха', path: meta.path, crumb: meta.crumb, location: 'mirny' })}
+>
+  <PageHero
+    photo="jet-volga"
+    eyebrow={site.name}
+    title="База активного отдыха в Казани"
+    lead="Не просто прокат техники, а полноценный отдых на природе: драйв, комфорт и живописные маршруты — для пар, семей, друзей и команд. Зимой и летом."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    service="baza"
+    cta="Узнать цены и забронировать"
+  />
+
+  <Advantages items={base.audiences} title="Для кого база" eyebrow="Форматы отдыха" />
+
+  {
+    groups.map((g, gi) => (
+      <section class:list={[gi % 2 === 0 ? 'slant bg-surface-grad' : 'section']} aria-labelledby={`base-${g.id}`}>
+        <div class="container-x">
+          <SectionHead id={`base-${g.id}`} eyebrow="Стоимость — по запросу" title={g.title} lead={g.lead} />
+          <ul class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {g.items.map((f, i) => (
+              <li class="reveal card card-hover flex items-center justify-between gap-4 p-5" style={`--d:${(i % 3) * 60}ms`}>
+                <span class="flex items-center gap-4">
+                  <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-deep/25 text-glow ring-1 ring-glow/30">
+                    <Icon name={f.icon} size={22} />
+                  </span>
+                  <span class="font-bold">{f.title}</span>
+                </span>
+                <span class="chip shrink-0 text-xs">по запросу</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <ServiceCards />
+  <FinalCta
+    service="baza"
+    title="Спланируйте отдых на базе"
+    lead="Расскажите, что хотите: баня, дома, пейнтбол или водные развлечения — администратор подскажет цены и свободные даты."
+  />
+</Base>

@@ -1,0 +1,51 @@
+---
+/** Ленивое видео: обложка с кнопкой play, iframe появляется только по клику. */
+import { embedUrl, watchUrl, type Video } from '@/data/videos';
+import Icon from '../ui/Icon.astro';
+import Pic from '../ui/Pic.astro';
+
+interface Props {
+  video: Video;
+  class?: string;
+}
+const { video, class: className } = Astro.props;
+const provider = video.provider === 'youtube' ? 'YouTube' : 'Rutube';
+---
+
+<figure class:list={['reveal flex flex-col gap-3', className]}>
+  <div
+    class:list={[
+      'lite-video card relative overflow-hidden !rounded-2xl',
+      video.vertical ? 'aspect-[9/16] max-h-[34rem]' : 'aspect-video',
+    ]}
+    data-embed={embedUrl(video)}
+    data-title={video.title}
+  >
+    <button
+      type="button"
+      class="group absolute inset-0 block h-full w-full cursor-pointer"
+      aria-label={`Смотреть видео «${video.title}» (${provider})`}
+    >
+      <Pic
+        photo={video.cover}
+        sizes="(min-width: 1024px) 33vw, 100vw"
+        widths={[480, 800]}
+        class="h-full w-full object-cover opacity-85 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
+        alt=""
+      />
+      <span class="absolute inset-0 bg-[linear-gradient(180deg,transparent_40%,rgb(5_7_13/0.8))]"></span>
+      <span
+        class="absolute left-1/2 top-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-deep text-white shadow-glow transition-transform duration-300 group-hover:scale-110"
+      >
+        <Icon name="play" size={26} class="translate-x-0.5" />
+      </span>
+      <span class="chip absolute left-3 top-3 bg-ink/70 text-xs">{provider}</span>
+    </button>
+  </div>
+  <figcaption class="flex items-start justify-between gap-3">
+    <span class="font-bold">{video.title}</span>
+    <a href={watchUrl(video)} target="_blank" rel="noopener" class="shrink-0 text-xs font-bold text-muted hover:text-glow">
+      Открыть на {provider}
+    </a>
+  </figcaption>
+</figure>

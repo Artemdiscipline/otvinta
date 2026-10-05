@@ -1,0 +1,39 @@
+---
+import Advantages from '@/components/blocks/Advantages.astro';
+import CertTeaser from '@/components/blocks/CertTeaser.astro';
+import Faq from '@/components/blocks/Faq.astro';
+import FinalCta from '@/components/blocks/FinalCta.astro';
+import Guests from '@/components/blocks/Guests.astro';
+import Locations from '@/components/blocks/Locations.astro';
+import Promos from '@/components/blocks/Promos.astro';
+import Reviews from '@/components/blocks/Reviews.astro';
+import ServiceCards from '@/components/blocks/ServiceCards.astro';
+import Stats from '@/components/blocks/Stats.astro';
+import TrackPicker from '@/components/blocks/TrackPicker.astro';
+import Videos from '@/components/blocks/Videos.astro';
+import HomeHero from '@/components/sections/HomeHero.astro';
+import { faqHome } from '@/data/faq';
+import { pages } from '@/data/pages';
+import { homeVideos } from '@/data/videos';
+import Base from '@/layouts/Base.astro';
+import { placesLd } from '@/lib/schema';
+
+const meta = pages.home;
+const origin = String(Astro.site);
+---
+
+<Base title={meta.title} description={meta.description} path={meta.path} jsonLd={placesLd(origin)}>
+  <HomeHero />
+  <Stats />
+  <ServiceCards />
+  <TrackPicker />
+  <Advantages />
+  <Promos />
+  <Guests />
+  <Videos items={homeVideos} />
+  <Reviews />
+  <CertTeaser />
+  <Faq items={faqHome} />
+  <Locations />
+  <FinalCta />
+</Base>

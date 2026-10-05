@@ -1,0 +1,61 @@
+---
+import { certificate } from '@/data/offers';
+import { href } from '@/lib/url';
+import Icon from '../ui/Icon.astro';
+import Pic from '../ui/Pic.astro';
+
+const withPhoto = certificate.designs.filter((d) => d.photo);
+---
+
+<section class="slant bg-surface-grad" aria-labelledby="cert-title">
+  <div class="container-x grid items-center gap-10 lg:grid-cols-2">
+    <div class="reveal">
+      <p class="eyebrow mb-3">Подарочные сертификаты</p>
+      <h2 id="cert-title" class="h-section">Подарите приключение, а не вещь</h2>
+      <p class="lead mt-4">{certificate.lead} {certificate.lineup}.</p>
+      <ul class="mt-6 flex flex-wrap gap-2">
+        {
+          certificate.designs.map((d) => (
+            <li class="chip">
+              <Icon name={d.icon} size={15} class="text-glow" />
+              {d.title}
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="mt-6 grid gap-3 sm:grid-cols-3">
+        {
+          certificate.delivery.map((d) => (
+            <li class="flex items-start gap-3 text-sm">
+              <Icon name={d.icon} size={20} class="mt-0.5 shrink-0 text-glow" />
+              <span class="font-semibold">{d.title}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href={href('/sertifikat')} class="btn btn-hot">Собрать сертификат <Icon name="gift" size={18} /></a>
+      </div>
+    </div>
+    <div class="reveal grid grid-cols-2 gap-3 sm:gap-4" style="--d:120ms">
+      {
+        withPhoto.map((d, i) => (
+          <figure
+            class:list={[
+              'photo-shade group relative overflow-hidden rounded-2xl border border-line',
+              i === 0 ? 'col-span-2 aspect-[16/9]' : 'aspect-square',
+            ]}
+          >
+            <Pic
+              photo={d.photo!}
+              sizes={i === 0 ? '(min-width: 1024px) 45vw, 100vw' : '(min-width: 1024px) 22vw, 50vw'}
+              widths={[400, 700, 1000]}
+              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <figcaption class="absolute bottom-3 left-3 right-3 z-10 text-sm font-bold">{d.title}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+---
+import { guests } from '@/data/site';
+import { BLADE, BLADE_ANGLES } from '@/lib/propeller';
+---
+
+<section class="section !py-16" aria-labelledby="guests-title">
+  <div class="container-x">
+    <div class="reveal card overflow-hidden p-6 sm:p-10">
+      <h2 class="eyebrow mb-3" id="guests-title">Среди наших гостей</h2>
+      <ul class="flex flex-wrap items-center gap-x-4 gap-y-3">
+        {
+          guests.map((g, i) => (
+            <li class="flex items-center gap-4">
+              {i > 0 && (
+                <svg viewBox="-30 -30 60 60" class="size-4 text-glow" aria-hidden="true">
+                  {BLADE_ANGLES.map((a) => (
+                    <path d={BLADE} transform={`rotate(${a})`} fill="currentColor" />
+                  ))}
+                </svg>
+              )}
+              <span class="font-display text-[clamp(1rem,0.8rem+1vw,1.5rem)] font-bold text-text">{g}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

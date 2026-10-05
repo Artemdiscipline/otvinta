@@ -1,0 +1,32 @@
+---
+import { advantages } from '@/data/site';
+import type { Fact } from '@/data/types';
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+
+interface Props {
+  items?: Fact[];
+  title?: string;
+  eyebrow?: string;
+}
+const { items = advantages, title = 'Почему «От винта»', eyebrow = 'Почему мы' } = Astro.props;
+---
+
+<section class="section" aria-labelledby="why-title">
+  <div class="container-x">
+    <SectionHead id="why-title" eyebrow={eyebrow} title={title} />
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {
+        items.map((a, i) => (
+          <li class="reveal card card-hover p-6" style={`--d:${(i % 4) * 70}ms`}>
+            <span class="grid size-12 place-items-center rounded-2xl bg-deep/25 text-glow ring-1 ring-glow/30">
+              <Icon name={a.icon} size={24} />
+            </span>
+            <h3 class="mt-5 font-display text-lg font-bold">{a.title}</h3>
+            {a.text && <p class="mt-2 text-sm text-muted">{a.text}</p>}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

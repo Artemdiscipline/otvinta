@@ -1,0 +1,151 @@
+---
+import Faq from '@/components/blocks/Faq.astro';
+import FinalCta from '@/components/blocks/FinalCta.astro';
+import Gallery from '@/components/blocks/Gallery.astro';
+import Promos from '@/components/blocks/Promos.astro';
+import TrackCards from '@/components/blocks/TrackCards.astro';
+import Videos from '@/components/blocks/Videos.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import BookButton from '@/components/ui/BookButton.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Footnote from '@/components/ui/Footnote.astro';
+import Pic from '@/components/ui/Pic.astro';
+import PriceTag from '@/components/ui/PriceTag.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import { faqFor } from '@/data/faq';
+import { pages } from '@/data/pages';
+import { minPrice, pricesMeta, quadModels, quadTracks } from '@/data/prices';
+import { promosFor } from '@/data/promos';
+import { location } from '@/data/site';
+import { videos } from '@/data/videos';
+import Base from '@/layouts/Base.astro';
+import { formatPrice } from '@/lib/format';
+import { servicePageLd } from '@/lib/schema';
+
+const meta = pages.kvadrotsikl;
+const origin = String(Astro.site);
+const loc = location('mirny');
+const order = ['green', 'red', 'black', 'individual'];
+const list = [...quadTracks].sort((a, b) => order.indexOf(a.track) - order.indexOf(b.track));
+const variant = (id: string) => quadTracks.flatMap((t) => t.variants).find((v) => v.id === id)!;
+const withMin2 = quadTracks.filter((t) => t.conditions?.length);
+const rows = [
+  { label: 'Производство', key: 'origin' },
+  { label: 'Привод', key: 'drive' },
+  { label: 'Посадка', key: 'seats' },
+  { label: 'Нагрузка', key: 'maxLoad' },
+] as const;
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  path={meta.path}
+  jsonLd={servicePageLd(origin, { name: 'Прокат квадроциклов', path: meta.path, crumb: meta.crumb, serviceId: 'kvadrotsikl', location: 'mirny' })}
+>
+  <PageHero
+    photo="quad-beach-wheelie"
+    eyebrow="Весна · лето · осень · Мирный"
+    title="Прокат квадроциклов в Казани"
+    lead="Не просто база проката, а полноценный отдых: короткая прогулка или большой тур по лесу, оврагам и берегу Волги — почасовая аренда, длительные заезды, индивидуальные и групповые маршруты."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    service="kvadrotsikl"
+    facts={[
+      { icon: 'ticket', label: 'Стоимость', value: formatPrice(minPrice('kvadrotsikl')), clarify: true },
+      { icon: 'gauge', label: 'Техника', value: 'Yamaha Grizzly 750, SHARK' },
+      { icon: 'baby', label: 'Дети', value: 'с 2 лет пассажиром' },
+      { icon: 'map-pin', label: 'Где', value: `${loc.short}, база «Динамо»` },
+    ]}
+    secondary={{ label: 'Маршруты и цены', href: '#marshruty', icon: 'route' }}
+  />
+
+  <section id="marshruty" class="section" aria-labelledby="routes-title">
+    <div class="container-x">
+      <SectionHead
+        id="routes-title"
+        eyebrow="Маршруты"
+        title="Выберите маршрут"
+        lead="От короткой Зелёной для новичков до Чёрной по настоящему бездорожью. Цвет — уровень сложности."
+      />
+      <div class="mt-10">
+        <TrackCards list={list} service="kvadrotsikl" />
+      </div>
+      <p class="mt-6 text-sm text-muted">{pricesMeta.disclaimer} Цены обновлены: {pricesMeta.updatedAtLabel}.</p>
+      <Footnote class="mt-1" />
+    </div>
+  </section>
+
+  <section class="slant bg-surface-grad" aria-labelledby="compare-title">
+    <div class="container-x">
+      <SectionHead id="compare-title" eyebrow="Техника" title="SHARK или Yamaha Grizzly 750?" lead="На Красной трассе можно выбрать технику — от неё зависит цена и кто поместится." />
+      <div class="mt-10 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+        <div class="reveal card overflow-x-auto p-2 md:p-4">
+          <table class="w-full min-w-[30rem] text-left">
+            <caption class="sr-only">Сравнение квадроциклов SHARK и Yamaha Grizzly 750</caption>
+            <thead>
+              <tr class="border-b border-line">
+                <th scope="col" class="p-4 text-xs font-extrabold uppercase tracking-widest text-muted"><span class="sr-only">Параметр</span></th>
+                {quadModels.map((m) => <th scope="col" class="p-4 font-display text-lg font-bold">{m.name}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                rows.map((r) => (
+                  <tr class="border-b border-line">
+                    <th scope="row" class="p-4 text-sm font-bold text-muted">{r.label}</th>
+                    {quadModels.map((m) => (
+                      <td class="p-4 text-sm">{m[r.key]}</td>
+                    ))}
+                  </tr>
+                ))
+              }
+              <tr class="border-b border-line">
+                <th scope="row" class="p-4 text-sm font-bold text-muted">Трассы</th>
+                {quadModels.map((m) => <td class="p-4 text-sm">{m.tracks.join(', ')}</td>)}
+              </tr>
+              <tr>
+                <th scope="row" class="p-4 text-sm font-bold text-muted">Красная трасса, ~1 час</th>
+                {
+                  quadModels.map((m) => (
+                    <td class="p-4">
+                      <PriceTag price={variant(m.redPrice).price} class="text-xl" />
+                      <div class="mt-3">
+                        <BookButton service="kvadrotsikl" program={m.redPrice} size="sm" label="Выбрать" icon={false} />
+                      </div>
+                    </td>
+                  ))
+                }
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="reveal photo-shade relative min-h-[18rem] overflow-hidden rounded-3xl border border-line" style="--d:120ms">
+          <Pic photo="quad-grizzly-shore" sizes="(min-width: 1024px) 35vw, 100vw" widths={[480, 800, 1000]} class="absolute inset-0 h-full w-full object-cover" />
+          <p class="absolute bottom-5 left-5 right-5 z-10 font-bold">Полный привод Grizzly 750 — для двоих взрослых и ребёнка до 5 лет.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="rules-title">
+    <div class="container-x">
+      <div class="reveal grid gap-6 rounded-3xl border border-line bg-surface p-6 sm:p-10 md:grid-cols-[auto_1fr] md:items-center">
+        <span class="grid size-16 place-items-center rounded-2xl bg-hot/15 text-hot ring-1 ring-hot/40">
+          <Icon name="users" size={30} />
+        </span>
+        <div>
+          <h2 id="rules-title" class="font-display text-xl font-bold sm:text-2xl">Условия для длинных маршрутов</h2>
+          <p class="mt-2 text-muted">
+            {withMin2.map((t) => t.title).join(' и ')} — от 2 квадроциклов. Соберите компанию — администратор поможет подобрать удобное время.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Promos items={promosFor('kvadrotsikl')} title="Бонусы гостям квадроциклов" />
+  <Gallery photos={['quad-beach-wheelie', 'quad-field', 'quad-grizzly-shore']} title="Квадроциклы в деле" />
+  <Videos items={videos.filter((v) => v.services.includes('kvadrotsikl'))} title="Квадроциклы на видео" />
+  <Faq items={faqFor('kvadrotsikl')} title="Вопросы о квадроциклах" />
+  <FinalCta service="kvadrotsikl" title="Забронируйте квадроцикл" />
+</Base>

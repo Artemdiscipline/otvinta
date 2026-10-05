@@ -1,0 +1,155 @@
+---
+import { mainNav } from '@/data/nav';
+import { locations, mainPhone, phones, site, socials } from '@/data/site';
+import { telHref } from '@/lib/format';
+import { href, isCurrent } from '@/lib/url';
+import BookButton from '../ui/BookButton.astro';
+import Icon from '../ui/Icon.astro';
+import Logo from '../ui/Logo.astro';
+
+const path = Astro.url.pathname;
+---
+
+<a href="#main" class="skip-link">Перейти к содержанию</a>
+
+<header
+  id="site-header"
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,border-color,box-shadow] duration-300 data-[scrolled=true]:border-line data-[scrolled=true]:bg-ink/95 data-[scrolled=true]:shadow-[0_10px_30px_-20px_rgb(0_0_0/0.9)]"
+  data-scrolled="false"
+>
+  <div class="mx-auto flex h-[var(--header-h)] w-full max-w-[96rem] items-center gap-3 px-4 md:px-8">
+    <a href={href('/')} class="shrink-0 rounded-lg" aria-label={`${site.name} — на главную`}>
+      <Logo uid="hdr" decorative class="w-[138px] sm:w-[156px]" />
+    </a>
+
+    <nav aria-label="Основное меню" class="ml-auto hidden xl:block">
+      <ul class="flex items-center">
+        {
+          mainNav.map((l) => (
+            <li>
+              <a
+                href={href(l.href)}
+                aria-current={isCurrent(path, l.href) ? 'page' : undefined}
+                class="relative block rounded-lg px-2 py-2 text-[0.875rem] font-bold text-text/85 transition-colors hover:text-glow aria-[current=page]:text-glow after:absolute after:inset-x-2 after:-bottom-0.5 after:h-0.5 after:scale-x-0 after:rounded after:bg-glow after:shadow-[0_0_10px_#4FB3FF] after:transition-transform hover:after:scale-x-100 aria-[current=page]:after:scale-x-100 min-[1440px]:px-2.5"
+              >
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a
+      href={telHref(mainPhone.e164)}
+      class="ml-auto hidden items-center gap-2 rounded-full px-2 py-2 font-extrabold tracking-wide text-text transition-colors hover:text-glow md:inline-flex xl:ml-1"
+      aria-label={`Позвонить: ${mainPhone.display}`}
+    >
+      <span class="grid size-9 place-items-center rounded-full border border-line bg-surface-2/60">
+        <Icon name="phone" size={17} />
+      </span>
+      <span class="xl:hidden min-[1440px]:inline">{mainPhone.display}</span>
+    </a>
+
+    <BookButton size="sm" class="hidden md:inline-flex" icon={false} />
+
+    <button
+      type="button"
+      class="ml-auto grid size-11 place-items-center rounded-full border border-line bg-surface-2/60 text-text transition hover:border-glow md:ml-1 xl:hidden"
+      aria-label="Открыть меню"
+      aria-controls="mobile-menu"
+      aria-expanded="false"
+      data-menu-open
+    >
+      <Icon name="menu" />
+    </button>
+  </div>
+</header>
+
+<dialog id="mobile-menu" class="modal" aria-label="Меню">
+  <div class="modal-panel flex min-h-full flex-col bg-ink">
+    <div class="pointer-events-none fixed inset-0 bg-[radial-gradient(80%_50%_at_100%_0%,rgb(10_77_255/0.35),transparent_70%)]"></div>
+    <div class="relative flex h-[var(--header-h)] items-center justify-between px-4 md:px-8">
+      <a href={href('/')} aria-label={`${site.name} — на главную`}>
+        <Logo uid="mnu" decorative class="w-[138px] sm:w-[156px]" />
+      </a>
+      <button
+        type="button"
+        class="grid size-11 place-items-center rounded-full border border-line text-text"
+        aria-label="Закрыть меню"
+        data-modal-close
+      >
+        <Icon name="x" />
+      </button>
+    </div>
+    <nav aria-label="Меню сайта" class="relative flex-1 px-4 pb-10 pt-4 md:px-8">
+      <ul class="grid gap-1">
+        {
+          mainNav.map((l) => (
+            <li>
+              <a
+                href={href(l.href)}
+                aria-current={isCurrent(path, l.href) ? 'page' : undefined}
+                class="flex items-center justify-between border-b border-line py-3 font-display text-[1.35rem] font-bold text-text transition-colors hover:text-glow aria-[current=page]:text-glow"
+              >
+                {l.label}
+                <Icon name="arrow-right" size={20} class="text-glow" />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a
+            href={href('/klub-ot-vinta-baza-aktivnogo-otdyha-v-kazani')}
+            class="flex items-center justify-between border-b border-line py-3 font-display text-[1.35rem] font-bold text-text hover:text-glow"
+          >
+            База отдыха <Icon name="arrow-right" size={20} class="text-glow" />
+          </a>
+        </li>
+      </ul>
+
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <div>
+          <p class="eyebrow mb-3">Телефоны</p>
+          <ul class="grid gap-2">
+            {
+              phones.map((p) => (
+                <li>
+                  <a href={telHref(p.e164)} class="text-lg font-extrabold hover:text-glow">
+                    {p.display}
+                  </a>
+                  {p.note && <span class="ml-2 text-sm text-muted">{p.note}</span>}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Мессенджеры</p>
+          <div class="flex flex-wrap gap-2">
+            {
+              socials.map((s) => (
+                <a href={s.url} target="_blank" rel="noopener" class="chip py-2" aria-label={s.label}>
+                  <Icon name={s.icon} size={18} /> {s.label}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+        <div class="sm:col-span-2">
+          <p class="eyebrow mb-3">Где мы</p>
+          <ul class="grid gap-2 text-sm text-muted">
+            {
+              locations.map((l) => (
+                <li>
+                  <span class="font-bold text-text">{l.title}:</span> {l.locality}, {l.street}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+      <BookButton class="mt-8 w-full" size="lg" />
+    </nav>
+  </div>
+</dialog>

@@ -1,0 +1,38 @@
+---
+/** Нижняя панель на телефоне (< 768px) — главный конверсионный элемент. */
+import { mainPhone, social } from '@/data/site';
+import { telHref } from '@/lib/format';
+import BookButton from '../ui/BookButton.astro';
+import Icon from '../ui/Icon.astro';
+
+const wa = social('whatsapp');
+const tg = social('telegram');
+const item =
+  'flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[0.7rem] font-bold text-text/90 transition-colors active:bg-surface-2';
+---
+
+<nav
+  aria-label="Быстрая связь"
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_-18px_rgb(30_144_255/0.6)] md:hidden"
+>
+  <ul class="mx-auto flex max-w-md items-stretch gap-1">
+    <li class="flex flex-1">
+      <a href={telHref(mainPhone.e164)} class={item}>
+        <Icon name="phone" size={20} class="text-glow" />Позвонить
+      </a>
+    </li>
+    <li class="flex flex-1">
+      <a href={wa.url} target="_blank" rel="noopener" class={item}>
+        <Icon name="whatsapp" size={20} class="text-[#4ade80]" />WhatsApp
+      </a>
+    </li>
+    <li class="flex flex-1">
+      <a href={tg.url} target="_blank" rel="noopener" class={item}>
+        <Icon name="telegram" size={20} class="text-glow" />Telegram
+      </a>
+    </li>
+    <li class="flex flex-[1.35]">
+      <BookButton label="Забронировать" size="sm" icon={false} class="w-full !min-h-12 !px-2 text-[0.8rem]" />
+    </li>
+  </ul>
+</nav>

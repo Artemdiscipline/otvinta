@@ -1,0 +1,45 @@
+---
+/**
+ * Кнопка «Забронировать». С JS открывает модалку заявки и подставляет услугу/программу.
+ * Без JS — обычная ссылка в WhatsApp клуба.
+ */
+import type { ServiceId } from '@/data/types';
+import { whatsappNumber } from '@/data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  service?: ServiceId;
+  program?: string;
+  label?: string;
+  variant?: 'hot' | 'blue' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+  icon?: boolean;
+  comment?: string;
+}
+
+const {
+  service,
+  program,
+  label = 'Забронировать',
+  variant = 'hot',
+  size = 'md',
+  class: className,
+  icon = true,
+  comment,
+} = Astro.props;
+
+const fallback = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Здравствуйте! Хочу забронировать заезд.')}`;
+---
+
+<a
+  href={fallback}
+  class:list={['btn', `btn-${variant}`, size === 'sm' && 'btn-sm', size === 'lg' && 'btn-lg', className]}
+  data-book
+  data-service={service}
+  data-program={program}
+  data-comment={comment}
+  rel="noopener"
+>
+  {label}{icon && <Icon name="arrow-right" size={18} />}
+</a>

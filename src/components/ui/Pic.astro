@@ -1,0 +1,52 @@
+---
+/**
+ * Фото клуба: <picture> с avif/webp, адаптивными размерами и ленивой загрузкой.
+ * Подпись (alt) и кадрирование берутся из src/data/photos.ts.
+ */
+import type { PhotoKey } from '@/data/photos';
+import { photoAlt, photoPos, pictureData } from '@/lib/images';
+
+interface Props {
+  photo: PhotoKey;
+  sizes?: string;
+  widths?: number[];
+  class?: string;
+  alt?: string;
+  pos?: string;
+  loading?: 'lazy' | 'eager';
+  priority?: boolean;
+  /** атрибуты для <img> (data-* и т. п.) */
+  attrs?: Record<string, string>;
+}
+
+const {
+  photo,
+  sizes = '(min-width: 1024px) 50vw, 100vw',
+  widths,
+  class: className = 'h-full w-full object-cover',
+  alt,
+  pos,
+  loading = 'lazy',
+  priority = false,
+  attrs = {},
+} = Astro.props;
+
+const d = await pictureData(photo, widths);
+---
+
+<picture class="contents">
+  <source type="image/avif" srcset={d.avif} sizes={sizes} />
+  <source type="image/webp" srcset={d.webp} sizes={sizes} />
+  <img
+    src={d.src}
+    width={d.width}
+    height={d.height}
+    alt={alt ?? photoAlt(photo)}
+    class={className}
+    style={`object-position: ${pos ?? photoPos(photo)}`}
+    loading={priority ? 'eager' : loading}
+    fetchpriority={priority ? 'high' : undefined}
+    decoding={priority ? 'sync' : 'async'}
+    {...attrs}
+  />
+</picture>

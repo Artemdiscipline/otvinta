@@ -1,0 +1,34 @@
+---
+/** Экран успеха после отправки любой формы. */
+import { site } from '@/data/site';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  text?: string;
+}
+const {
+  text = `Администратор свяжется с вами. Приезжайте ${site.arriveBefore} — переодеться и пройти инструктаж.`,
+} = Astro.props;
+---
+
+<div class="lead-success hidden" role="status" tabindex="-1">
+  <div class="flex flex-col items-center gap-4 py-6 text-center">
+    <span class="grid size-20 place-items-center rounded-full bg-deep text-white shadow-glow">
+      <Icon name="circle-check-big" size={40} />
+    </span>
+    <p class="font-display text-2xl font-extrabold">Заявка отправлена</p>
+    <p class="lead max-w-md">{text}</p>
+    <div class="lead-success-tg hidden w-full max-w-md text-left">
+      <p class="mb-2 text-sm text-muted">
+        Текст заявки скопирован — вставьте его в чат Telegram. Если не скопировался, выделите вручную:
+      </p>
+      <textarea class="input text-sm" rows="6" readonly data-lead-text aria-label="Текст заявки"></textarea>
+    </div>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a class="btn btn-ghost btn-sm" href="#" target="_blank" rel="noopener" data-lead-reopen>
+        <Icon name="external-link" size={16} /> Открыть мессенджер ещё раз
+      </a>
+      <button type="button" class="btn btn-ghost btn-sm" data-lead-again>Новая заявка</button>
+    </div>
+  </div>
+</div>

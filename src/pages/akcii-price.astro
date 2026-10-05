@@ -1,0 +1,163 @@
+---
+import PriceList from '@/components/blocks/PriceList.astro';
+import Promos from '@/components/blocks/Promos.astro';
+import TrackTable from '@/components/blocks/TrackTable.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Footnote from '@/components/ui/Footnote.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import { pages } from '@/data/pages';
+import { catalog, onRequestServices, pricesMeta, quadTracks, snowmobileTracks } from '@/data/prices';
+import { site } from '@/data/site';
+import Base from '@/layouts/Base.astro';
+import { breadcrumbsLd, serviceLd } from '@/lib/schema';
+import { href } from '@/lib/url';
+
+const meta = pages.prices;
+const origin = String(Astro.site);
+const sort = <T extends { track: string }>(list: T[], order: string[]) => [...list].sort((a, b) => order.indexOf(a.track) - order.indexOf(b.track));
+const snow = sort(snowmobileTracks, ['white', 'green', 'red', 'black', 'individual']);
+const quad = sort(quadTracks, ['green', 'red', 'black', 'individual']);
+const groups = (id: string) => catalog.find((c) => c.id === id)!.groups;
+
+const tabs = [
+  { key: 'snow', label: 'Снегоходы', icon: 'snowflake' as const },
+  { key: 'quad', label: 'Квадроциклы', icon: 'mountain' as const },
+  { key: 'jet', label: 'Гидроциклы', icon: 'waves' as const },
+  { key: 'fly', label: 'Флайборд', icon: 'wind' as const },
+];
+
+const ld = [
+  breadcrumbsLd(origin, [{ name: meta.crumb, path: meta.path }]),
+  ...catalog.map((c) => serviceLd(origin, c.label, meta.path, c.groups.flatMap((g) => g.items))),
+];
+---
+
+<Base title={meta.title} description={meta.description} path={meta.path} jsonLd={ld}>
+  <PageHero
+    photo="jet-yamaha-pair"
+    compact
+    eyebrow={`Цены обновлены: ${pricesMeta.updatedAtLabel}`}
+    title="Цены и акции"
+    lead="Все тарифы клуба в одном месте, калькулятор стоимости и бонусы для гостей."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    cta={false}
+    secondary={{ label: 'Калькулятор', href: '#kalkulyator', icon: 'calculator' }}
+  />
+
+  <section class="section !pt-12" aria-labelledby="prices-title">
+    <div class="container-x">
+      <h2 id="prices-title" class="sr-only">Тарифы</h2>
+      <div data-tabs>
+        <div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0" role="tablist" aria-label="Тарифы по технике" data-tablist>
+          {
+            tabs.map((t, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`tab-${t.key}`}
+                aria-controls={`panel-${t.key}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                data-tab-key={t.key}
+                class="seg-btn shrink-0 border border-line !px-5 !py-2.5"
+              >
+                <Icon name={t.icon} size={18} />
+                {t.label}
+              </button>
+            ))
+          }
+        </div>
+
+        <div id="panel-snow" role="tabpanel" aria-labelledby="tab-snow" tabindex="0" class="mt-6" data-active>
+          <TrackTable list={snow} service="snegokhod" caption="Тарифы на снегоходы" />
+        </div>
+        <div id="panel-quad" role="tabpanel" aria-labelledby="tab-quad" tabindex="0" class="mt-6">
+          <TrackTable list={quad} service="kvadrotsikl" caption="Тарифы на квадроциклы" />
+        </div>
+        <div id="panel-jet" role="tabpanel" aria-labelledby="tab-jet" tabindex="0" class="mt-6">
+          <PriceList groups={groups('gidrocikl')} service="gidrocikl" />
+          <p class="mt-4 text-sm text-muted">{pricesMeta.disclaimer}</p>
+        </div>
+        <div id="panel-fly" role="tabpanel" aria-labelledby="tab-fly" tabindex="0" class="mt-6">
+          <PriceList groups={groups('flaybord')} service="flaybord" />
+          <p class="mt-4 text-sm text-muted">{pricesMeta.disclaimer}</p>
+        </div>
+      </div>
+      <Footnote class="mt-2" />
+
+      <div class="reveal mt-10 rounded-3xl border border-line bg-surface p-6 sm:p-8">
+        <h3 class="font-display text-lg font-bold">Без прайса на сайте — стоимость по запросу</h3>
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {onRequestServices.map((s) => <li class="chip first-letter:uppercase">{s}</li>)}
+        </ul>
+        <p class="mt-4 text-sm text-muted">
+          Подробнее — на страницах <a class="text-glow hover:text-text" href={href('/klub-ot-vinta-baza-aktivnogo-otdyha-v-kazani')}>базы отдыха</a>,
+          <a class="text-glow hover:text-text" href={href('/vodnoye-shou')}>аквабайк-шоу</a> и
+          <a class="text-glow hover:text-text" href={href('/korporativnyy-otdykh')}>корпоративов</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="kalkulyator" class="slant bg-surface-grad" aria-labelledby="calc-title">
+    <div class="container-x">
+      <SectionHead id="calc-title" eyebrow="Калькулятор" title="Сколько будет стоить" lead="Выберите технику, трассу или программу и количество — посчитаем примерную сумму." />
+      <form class="reveal mt-10 grid gap-5 lg:grid-cols-[1.4fr_1fr]" data-calc>
+        <div class="card grid gap-5 p-5 sm:p-7">
+          <div class="field">
+            <label class="field-label" for="calc-service">1. Техника</label>
+            <select id="calc-service" class="input" name="service">
+              {catalog.map((c, i) => <option value={c.id} selected={i === 0}>{c.label}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="calc-item">2. Трасса или программа</label>
+            <select id="calc-item" class="input" name="item"></select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="calc-qty">3. Количество <span class="font-normal text-muted" data-calc-unit></span></label>
+            <div class="flex items-center gap-2">
+              <button type="button" class="grid size-12 shrink-0 place-items-center rounded-xl border border-line text-xl font-bold hover:border-glow" data-calc-step="-1" aria-label="Меньше">−</button>
+              <input id="calc-qty" class="input text-center text-lg font-bold" type="number" name="qty" min="1" max="50" value="1" inputmode="numeric" />
+              <button type="button" class="grid size-12 shrink-0 place-items-center rounded-xl border border-line text-xl font-bold hover:border-glow" data-calc-step="1" aria-label="Больше">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="card flex flex-col overflow-hidden lg:sticky lg:top-28 lg:self-start">
+          <div class="blueprint p-6 sm:p-7">
+            <p class="eyebrow">Итого</p>
+            <output class="price mt-3 block text-[clamp(1.6rem,1.1rem+2.5vw,3rem)] !whitespace-normal text-gradient" for="calc-service calc-item calc-qty" aria-live="polite" data-calc-total>—</output>
+            <p class="mt-2 text-sm text-muted" data-calc-detail></p>
+          </div>
+          <div class="grid gap-3 p-6 sm:p-7">
+            <a href="#kalkulyator" class="btn btn-hot btn-lg w-full" data-book data-calc-book>
+              Забронировать с этим расчётом <Icon name="arrow-right" size={18} />
+            </a>
+            <p class="text-xs text-muted">{pricesMeta.disclaimer}</p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <Promos title="Акции и бонусы" link={false} slant={false} />
+
+  <section class="section !pt-0" aria-labelledby="important-title">
+    <div class="container-x">
+      <div class="reveal grid gap-4 rounded-3xl border border-hot/40 bg-hot/10 p-6 sm:p-8 md:grid-cols-3">
+        <h2 id="important-title" class="font-display text-xl font-bold md:col-span-3">Важно</h2>
+        <p class="flex gap-3"><Icon name="calendar" size={22} class="shrink-0 text-hot" /> На выходные бронируйте заранее — популярное время разбирают быстро.</p>
+        <p class="flex gap-3"><Icon name="clock" size={22} class="shrink-0 text-hot" /> Приезжайте {site.arriveBefore}: переодеться и пройти инструктаж.</p>
+        <p class="flex gap-3"><Icon name="map-pin" size={22} class="shrink-0 text-hot" /> Снег и квадроциклы — в Мирном, вода — в Боровом Матюшине.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { initTabs } from '@/scripts/tabs';
+  import { initCalc } from '@/scripts/calc';
+  initTabs();
+  initCalc();
+</script>

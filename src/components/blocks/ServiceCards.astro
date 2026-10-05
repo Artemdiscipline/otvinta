@@ -1,0 +1,64 @@
+---
+/** Крупные карточки услуг с фото и ценой «от». Порядок на главной меняется по сезону. */
+import { location } from '@/data/site';
+import { services } from '@/data/services';
+import { formatPrice } from '@/lib/format';
+import { href } from '@/lib/url';
+import BookButton from '../ui/BookButton.astro';
+import Icon from '../ui/Icon.astro';
+import Pic from '../ui/Pic.astro';
+import SectionHead from '../ui/SectionHead.astro';
+---
+
+<section id="uslugi" class="section" aria-labelledby="services-title">
+  <div class="container-x">
+    <SectionHead
+      id="services-title"
+      eyebrow="Чем заняться"
+      title="Техника, вода и праздники"
+      lead="Снегоходы и квадроциклы катаем в Мирном, гидроциклы и флайборд — на Волге в Боровом Матюшине."
+    >
+      <a href={href('/akcii-price')} class="btn btn-ghost shrink-0">Все цены <Icon name="arrow-right" size={18} /></a>
+    </SectionHead>
+
+    <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-season-cards>
+      {
+        services.map((s, i) => (
+          <li class="reveal" data-service-card={s.id} style={`--d:${(i % 3) * 90}ms`}>
+            <article class="card card-hover group flex h-full flex-col overflow-hidden">
+              <div class="photo-shade relative aspect-[4/3] overflow-hidden">
+                <Pic
+                  photo={s.photo}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  widths={[400, 640, 900]}
+                  class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <span class="chip absolute left-4 top-4 z-10 bg-ink/70">
+                  <Icon name={s.icon} size={16} class="text-glow" />
+                  {s.location ? location(s.location).short : 'Выезд'}
+                </span>
+              </div>
+              <div class="flex flex-1 flex-col gap-3 p-5 sm:p-6">
+                <h3 class="font-display text-xl font-extrabold sm:text-2xl">
+                  <a href={href(s.path)} class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+                    {s.title}
+                  </a>
+                </h3>
+                <p class="text-sm text-muted">{s.tagline}</p>
+                <div class="mt-auto flex items-end justify-between gap-3 pt-3">
+                  <p>
+                    <span class="block text-xs font-bold uppercase tracking-widest text-muted">Стоимость</span>
+                    <span class="price text-xl text-text">
+                      {s.price.kind === 'request' && s.priceAlt ? s.priceAlt : formatPrice(s.price)}
+                    </span>
+                  </p>
+                  <BookButton service={s.bookingId} size="sm" label="Бронь" class="relative z-10" />
+                </div>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,135 @@
+---
+import Faq from '@/components/blocks/Faq.astro';
+import FinalCta from '@/components/blocks/FinalCta.astro';
+import Gallery from '@/components/blocks/Gallery.astro';
+import LocationCard from '@/components/blocks/LocationCard.astro';
+import Steps from '@/components/blocks/Steps.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import BookButton from '@/components/ui/BookButton.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Pic from '@/components/ui/Pic.astro';
+import PriceTag from '@/components/ui/PriceTag.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import { faqFor } from '@/data/faq';
+import { pages } from '@/data/pages';
+import { flyboardTariffs, minPrice, pricesMeta } from '@/data/prices';
+import { location } from '@/data/site';
+import Base from '@/layouts/Base.astro';
+import { formatPrice } from '@/lib/format';
+import { servicePageLd } from '@/lib/schema';
+import { href } from '@/lib/url';
+
+const meta = pages.flaybord;
+const origin = String(Astro.site);
+const loc = location('santa');
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  path={meta.path}
+  jsonLd={servicePageLd(origin, { name: 'Полёт на флайборде', path: meta.path, crumb: meta.crumb, serviceId: 'flaybord', location: 'santa' })}
+>
+  <PageHero
+    photo="flyboard-silhouette"
+    eyebrow="Летний сезон · Волга"
+    title="Полёт на флайборде и ховерборде в Казани"
+    lead="Флайборд — доска, которая поднимает вас над водой за счёт мощных струй. Безопасное и контролируемое развлечение с максимумом адреналина."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    service="flaybord"
+    facts={[
+      { icon: 'ticket', label: 'Стоимость', value: formatPrice(minPrice('flaybord')) },
+      { icon: 'users', label: 'Возраст', value: 'от 7 до 70 лет' },
+      { icon: 'timer', label: 'Новичку', value: '~1 час' },
+      { icon: 'map-pin', label: 'Где', value: 'Волга, пляж «Санта»' },
+    ]}
+    secondary={{ label: 'Тарифы', href: '#tarify', icon: 'ticket' }}
+  />
+
+  <section class="section" aria-labelledby="what-title">
+    <div class="container-x grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class="reveal">
+        <p class="eyebrow mb-3">Что это</p>
+        <h2 id="what-title" class="h-section">Полёт над водой на реактивной струе</h2>
+        <p class="lead mt-4">
+          Катание на флайборде доступно практически каждому — участникам от 7 до 70 лет. Полёт проходит под контролем инструктора, поэтому взлететь получается даже у новичков.
+        </p>
+        <div class="card mt-6 flex items-start gap-4 p-5">
+          <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-hot/15 text-hot ring-1 ring-hot/40">
+            <Icon name="wind" size={22} />
+          </span>
+          <p class="text-sm">
+            <b>Ховерборд</b> — для тех, кто уже уверенно стоит на сноуборде или скейте. Попробовать оба можно в тарифе «Всё включено».
+          </p>
+        </div>
+      </div>
+      <div class="reveal photo-shade relative aspect-[4/5] overflow-hidden rounded-3xl border border-line sm:aspect-[4/3] lg:aspect-[4/5]" style="--d:120ms">
+        <Pic photo="flyboard-arc" sizes="(min-width: 1024px) 45vw, 100vw" widths={[480, 800, 1000]} />
+      </div>
+    </div>
+  </section>
+
+  <section class="slant bg-surface-grad" aria-labelledby="how-title">
+    <div class="container-x">
+      <SectionHead id="how-title" eyebrow="Как проходит" title="Три шага до полёта" />
+      <div class="mt-10">
+        <Steps
+          steps={[
+            { icon: 'clipboard-list', title: 'Инструктаж', text: 'Инструктор объясняет, как держать баланс и управлять струёй.' },
+            { icon: 'shield-check', title: 'Экипировка', text: 'Выдаём спасательный жилет, шлем и гидрокостюм.' },
+            { icon: 'wind', title: 'Полёт', text: 'Взлетаете над водой под контролем инструктора.' },
+          ]}
+        />
+      </div>
+    </div>
+  </section>
+
+  <section id="tarify" class="section" aria-labelledby="fly-prices-title">
+    <div class="container-x">
+      <SectionHead id="fly-prices-title" eyebrow="Тарифы" title="Сколько стоит полёт" />
+      <ul class="mt-10 grid gap-4 md:grid-cols-3">
+        {
+          flyboardTariffs.map((t, i) => (
+            <li class="reveal" style={`--d:${i * 90}ms`}>
+              <article class:list={['card card-hover flex h-full flex-col p-6 sm:p-8', 'badge' in t && 'border-hot/50 shadow-hot']}>
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="font-display text-xl font-bold">{t.name}</h3>
+                  {'badge' in t && <span class="chip chip-hot">{t.badge}</span>}
+                </div>
+                <p class="mt-2 flex items-center gap-2 text-sm text-muted">
+                  <Icon name="timer" size={16} class="text-glow" /> {t.duration}
+                </p>
+                <p class="mt-4 flex-1 text-text/85">{t.text}</p>
+                <PriceTag price={t.price} class="mt-6 text-3xl" />
+                <BookButton service="flaybord" program={t.id} class="mt-5 w-full" variant={'badge' in t ? 'hot' : 'blue'} />
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-6 text-sm text-muted">{pricesMeta.disclaimer}</p>
+    </div>
+  </section>
+
+  <section class="slant bg-surface-grad" aria-labelledby="fly-place-title">
+    <div class="container-x grid gap-8 lg:grid-cols-2 lg:items-center">
+      <div class="reveal">
+        <p class="eyebrow mb-3">Где летаем</p>
+        <h2 id="fly-place-title" class="h-section">Волга, пляж «Санта», Боровое Матюшино</h2>
+        <p class="lead mt-4">Та же площадка, что и у гидроциклов. Можно совместить полёт с прогулкой на гидроцикле.</p>
+        <div class="mt-6 rounded-2xl border border-line bg-ink/40 p-5">
+          <p class="font-display text-lg font-bold">Флайборд-шоу на ваш праздник</p>
+          <p class="mt-2 text-sm text-muted">Спортсмены клуба выступают с трюками на флайборде, ховерборде и гидроцикле.</p>
+          <a href={href('/vodnoye-shou')} class="mt-4 inline-flex items-center gap-2 font-bold text-glow hover:text-text">
+            Об аквабайк-шоу <Icon name="arrow-right" size={16} />
+          </a>
+        </div>
+      </div>
+      <LocationCard loc={loc} index={1} />
+    </div>
+  </section>
+
+  <Gallery photos={['flyboard-arc', 'flyboard-silhouette', 'show-jet-flip']} title="Флайборд на Волге" />
+  <Faq items={faqFor('flaybord')} title="Вопросы о флайборде" />
+  <FinalCta service="flaybord" title="Забронируйте полёт" />
+</Base>

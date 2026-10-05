@@ -1,0 +1,129 @@
+---
+import { footerInfo, footerServices } from '@/data/nav';
+import { hours, instagram, locations, phones, site, socials } from '@/data/site';
+import { telHref } from '@/lib/format';
+import { href } from '@/lib/url';
+import Footnote from '../ui/Footnote.astro';
+import Icon from '../ui/Icon.astro';
+import Logo from '../ui/Logo.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="relative overflow-hidden border-t border-line bg-surface pt-16 pb-10">
+  <div class="pointer-events-none absolute -left-40 -top-40 size-[30rem] rounded-full bg-deep/15 blur-3xl"></div>
+  <div class="container-x relative">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <Logo uid="ftr" variant="full" class="w-[250px]" />
+        <p class="mt-5 max-w-sm text-sm text-muted">
+          Клуб активного отдыха в Казани: снегоходы, квадроциклы, гидроциклы, флайборд, аквабайк-шоу и корпоративы.
+        </p>
+        <ul class="mt-6 flex flex-wrap gap-2" aria-label="Мессенджеры и соцсети">
+          {
+            socials.map((s) => (
+              <li>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener"
+                  class="grid size-11 place-items-center rounded-full border border-line bg-ink/60 text-text transition hover:border-glow hover:text-glow hover:shadow-glow-sm"
+                  aria-label={s.label}
+                  title={s.label}
+                >
+                  <Icon name={s.icon} size={20} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="grid gap-8 sm:grid-cols-2 lg:col-span-8 lg:grid-cols-3">
+        <div class="sm:col-span-2 lg:col-span-1">
+          <p class="eyebrow mb-4">Где мы</p>
+          <ul class="grid gap-5 text-sm">
+            {
+              locations.map((l) => (
+                <li>
+                  <p class="flex items-center gap-2 font-bold text-text">
+                    <Icon name={l.icon} size={16} class="text-glow" />
+                    {l.title}
+                  </p>
+                  <p class="mt-1 text-muted">
+                    {l.locality}, {l.street}
+                    {l.streetClarify && (
+                      <span class="clarify" title="Уточняйте у администратора">
+                        *
+                      </span>
+                    )}
+                  </p>
+                  <p class="text-muted">{l.landmarks.join(', ')}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow mb-4">Телефоны</p>
+          <ul class="grid gap-2">
+            {
+              phones.map((p) => (
+                <li>
+                  <a href={telHref(p.e164)} class="font-extrabold text-text transition-colors hover:text-glow">
+                    {p.display}
+                  </a>
+                  {p.note && <span class="block text-xs text-muted">{p.note}</span>}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-4 text-sm text-muted">
+            {hours.label}<span class="clarify" title="Уточняйте у администратора">*</span>
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-8 sm:col-span-2 lg:col-span-1 lg:grid-cols-1">
+          <div>
+            <p class="eyebrow mb-4">Услуги</p>
+            <ul class="grid gap-2 text-sm">
+              {
+                footerServices.map((l) => (
+                  <li>
+                    <a href={href(l.href)} class="text-muted transition-colors hover:text-text">
+                      {l.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div>
+            <p class="eyebrow mb-4">Клуб</p>
+            <ul class="grid gap-2 text-sm">
+              {
+                footerInfo.map((l) => (
+                  <li>
+                    <a href={href(l.href)} class="text-muted transition-colors hover:text-text">
+                      {l.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-xs text-muted md:flex-row md:items-center md:justify-between">
+      <p>© {site.name}, {year}. {site.slogan}!</p>
+      <Footnote class="!text-xs" />
+      <p>
+        <a href={instagram.url} target="_blank" rel="noopener" class="hover:text-text">Instagram: {instagram.handle}</a>
+        <span class="block opacity-80 md:inline md:before:content-['_·_']">
+          принадлежит Meta, признанной экстремистской и запрещённой в РФ
+        </span>
+      </p>
+    </div>
+  </div>
+</footer>

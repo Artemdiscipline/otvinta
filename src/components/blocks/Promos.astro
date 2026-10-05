@@ -1,0 +1,56 @@
+---
+import { promos as all, type Promo } from '@/data/promos';
+import { href } from '@/lib/url';
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+
+interface Props {
+  items?: Promo[];
+  title?: string;
+  link?: boolean;
+  slant?: boolean;
+}
+const { items = all, title = 'Бонусы и акции', link = true, slant = true } = Astro.props;
+---
+
+<section id="akcii" class:list={[slant ? 'slant' : 'section', 'bg-surface-grad']} aria-labelledby="promos-title">
+  <div class="container-x">
+    <SectionHead id="promos-title" eyebrow="Подарки гостям" title={title}>
+      {
+        link && (
+          <a href={href('/akcii-price')} class="btn btn-ghost shrink-0">
+            Цены и акции <Icon name="arrow-right" size={18} />
+          </a>
+        )
+      }
+    </SectionHead>
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        items.map((p, i) => (
+          <li
+            class:list={[
+              'reveal card card-hover relative overflow-hidden p-6',
+              items.length % 3 === 1 && i === items.length - 1 && 'sm:col-span-2 lg:col-span-3',
+              p.hot && 'border-hot/50 bg-[linear-gradient(140deg,rgb(255_106_26/0.16),rgb(12_18_32/0.95)_55%)]',
+            ]}
+            style={`--d:${(i % 3) * 80}ms`}
+          >
+            <div class="flex items-start justify-between gap-4">
+              <span
+                class:list={[
+                  'grid size-12 shrink-0 place-items-center rounded-2xl ring-1',
+                  p.hot ? 'bg-hot/20 text-hot ring-hot/40' : 'bg-deep/25 text-glow ring-glow/30',
+                ]}
+              >
+                <Icon name={p.icon} size={24} />
+              </span>
+              <span class:list={['chip', p.hot && 'chip-hot']}>{p.tag}</span>
+            </div>
+            <h3 class="mt-5 font-display text-lg font-bold">{p.title}</h3>
+            <p class="mt-2 text-sm text-muted">{p.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

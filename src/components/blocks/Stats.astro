@@ -1,0 +1,29 @@
+---
+/** Полоса цифр со счётчиками. Итоговые числа есть в HTML — для SEO и без JS. */
+import { stats } from '@/data/site';
+---
+
+<section aria-label="Клуб в цифрах" class="relative z-10 border-y border-line bg-surface/80">
+  <div class="container-x">
+    <ul class="grid grid-cols-2 divide-line sm:grid-cols-3 xl:grid-cols-6">
+      {
+        stats.map((s, i) => (
+          <li
+            class="reveal flex flex-col gap-1 border-line px-2 py-6 sm:px-5 md:py-8 [&:nth-child(odd)]:border-r sm:[&:nth-child(odd)]:border-r-0 sm:[&:not(:nth-child(3n))]:border-r xl:[&:not(:last-child)]:border-r"
+            style={`--d:${i * 70}ms`}
+          >
+            <span class="font-display whitespace-nowrap text-[clamp(1.7rem,1.2rem+1.5vw,2.15rem)] leading-none font-extrabold text-gradient">
+              {s.prefix}<span data-count={s.value}>{s.value}</span>{s.suffix}{s.clarify && <span class="clarify align-super text-base" title="Уточняйте у администратора">*</span>}
+            </span>
+            <span class="text-sm font-semibold text-muted">{s.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { initCounters } from '@/scripts/counters';
+  initCounters();
+</script>

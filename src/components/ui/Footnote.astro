@@ -1,0 +1,9 @@
+---
+/** Пояснение к звёздочке у спорных цен и фактов. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<p class:list={['footnote', className]}><span class="clarify" aria-hidden="true">*</span> Уточняйте у администратора<slot /></p>

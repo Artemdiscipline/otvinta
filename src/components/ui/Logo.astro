@@ -1,0 +1,100 @@
+---
+/**
+ * SVG-вордмарк «ОТ ⟲ ВИНТА»: трёхлопастной пропеллер между словами, синий градиент
+ * со свечением, слоган разреженным капсом. textLength фиксирует ширину букв —
+ * логотип не «прыгает», пока грузится шрифт.
+ */
+import { BLADE, BLADE_ANGLES } from '@/lib/propeller';
+import { site } from '@/data/site';
+
+interface Props {
+  variant?: 'full' | 'compact';
+  /** уникальный префикс id градиентов, если логотипов на странице несколько */
+  uid: string;
+  class?: string;
+  decorative?: boolean;
+}
+
+const { variant = 'compact', uid, class: className, decorative = false } = Astro.props;
+const full = variant === 'full';
+const vb = full ? '-4 -4 360 86' : '-4 -4 360 62';
+const g = `${uid}-g`;
+const pb = `${uid}-pb`;
+const f = `${uid}-f`;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={vb}
+  class:list={['prop-hover block h-auto', className]}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : `${site.name} — ${site.slogan}`}
+  aria-hidden={decorative ? 'true' : undefined}
+>
+  <defs>
+    <linearGradient id={g} x1="0" y1="8" x2="0" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EAF2FF"></stop>
+      <stop offset="0.48" stop-color="#4FB3FF"></stop>
+      <stop offset="1" stop-color="#1E7BFF"></stop>
+    </linearGradient>
+    <linearGradient id={pb} x1="0" y1="-28" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EAF2FF"></stop>
+      <stop offset="0.4" stop-color="#4FB3FF"></stop>
+      <stop offset="1" stop-color="#0A4DFF"></stop>
+    </linearGradient>
+    <filter id={f} x="-10%" y="-40%" width="120%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3.2" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#1E90FF" flood-opacity="0.75"></feFlood>
+      <feComposite in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge>
+        <feMergeNode in="glow"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter={`url(#${f})`}>
+    <text
+      x="0"
+      y="46"
+      textLength="74"
+      lengthAdjust="spacingAndGlyphs"
+      fill={`url(#${g})`}
+      font-family="'Unbounded Variable', 'Arial Black', sans-serif"
+      font-weight="900"
+      font-size="46">ОТ</text
+    >
+    <g transform="translate(108 27)">
+      <g class="spin-on-hover" style="transform-box: fill-box; transform-origin: 50% 50%">
+        <circle r="30" fill="none"></circle>
+        {BLADE_ANGLES.map((a) => <path d={BLADE} transform={`rotate(${a})`} fill={`url(#${pb})`} />)}
+        <circle r="6.5" fill="#EAF2FF"></circle>
+        <circle r="2.5" fill="#0A4DFF"></circle>
+      </g>
+    </g>
+    <text
+      x="142"
+      y="46"
+      textLength="208"
+      lengthAdjust="spacingAndGlyphs"
+      fill={`url(#${g})`}
+      font-family="'Unbounded Variable', 'Arial Black', sans-serif"
+      font-weight="900"
+      font-size="46">ВИНТА</text
+    >
+  </g>
+  {
+    full && (
+      <text
+        x="1"
+        y="76"
+        textLength="348"
+        lengthAdjust="spacing"
+        fill="#9EC9FF"
+        font-family="'Manrope Variable', 'Segoe UI', sans-serif"
+        font-weight="700"
+        font-size="11.5"
+      >{site.slogan.toUpperCase()}</text>
+    )
+  }
+</svg>

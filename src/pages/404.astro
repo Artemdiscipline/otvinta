@@ -1,0 +1,53 @@
+---
+import BookButton from '@/components/ui/BookButton.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { mainNav } from '@/data/nav';
+import Base from '@/layouts/Base.astro';
+import { BLADE, BLADE_ANGLES } from '@/lib/propeller';
+import { href } from '@/lib/url';
+---
+
+<Base title="Страница не найдена | Клуб «От винта»" description="Такой страницы нет. Вернитесь на главную или выберите трассу." path="/404" noindex>
+  <section class="blueprint relative isolate flex min-h-[90svh] items-center overflow-hidden pt-[var(--header-h)]" aria-labelledby="nf-title">
+    <div class="grain pointer-events-none absolute inset-0 -z-10"></div>
+    <div class="container-x grid items-center gap-10 py-16 lg:grid-cols-[1fr_auto]">
+      <div>
+        <p class="eyebrow">Ошибка 404</p>
+        <h1 id="nf-title" class="mt-4 font-display text-[clamp(2rem,1.2rem+4vw,4.5rem)] leading-[1.05] font-extrabold">
+          Похоже, вы свернули <span class="text-gradient">с трассы</span>
+        </h1>
+        <p class="lead mt-5 max-w-xl">Такой страницы нет — возможно, адрес изменился. Вернитесь на главную или сразу выберите, на чём кататься.</p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href={href('/')} class="btn btn-blue btn-lg">На главную <Icon name="arrow-right" size={18} /></a>
+          <BookButton label="Забронировать заезд" size="lg" />
+        </div>
+        <ul class="mt-10 flex flex-wrap gap-2">
+          {
+            mainNav.map((l) => (
+              <li>
+                <a href={href(l.href)} class="chip py-2 hover:border-glow">
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <svg viewBox="-32 -32 64 64" class="mx-auto hidden w-72 opacity-90 lg:block xl:w-96" aria-hidden="true">
+        <defs>
+          <linearGradient id="nf-g" x1="0" y1="-28" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#EAF2FF"></stop>
+            <stop offset="0.4" stop-color="#4FB3FF"></stop>
+            <stop offset="1" stop-color="#0A4DFF"></stop>
+          </linearGradient>
+        </defs>
+        <g class="spin-slow" style="transform-box: fill-box; transform-origin: 50% 50%">
+          <circle r="31" fill="none" stroke="#4FB3FF" stroke-width="0.3" stroke-dasharray="1 2"></circle>
+          {BLADE_ANGLES.map((a) => <path d={BLADE} transform={`rotate(${a})`} fill="url(#nf-g)" />)}
+          <circle r="6.5" fill="#EAF2FF"></circle>
+          <circle r="2.6" fill="#0A4DFF"></circle>
+        </g>
+      </svg>
+    </div>
+  </section>
+</Base>

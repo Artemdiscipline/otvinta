@@ -1,0 +1,32 @@
+---
+import { pages } from '@/data/pages';
+import { href } from '@/lib/url';
+import Icon from './Icon.astro';
+
+interface Props {
+  trail: { name: string; path: string }[];
+}
+const { trail } = Astro.props;
+const all = [{ name: pages.home.crumb, path: '/' }, ...trail];
+---
+
+<nav aria-label="Хлебные крошки" class="text-sm text-muted">
+  <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+    {
+      all.map((c, i) => (
+        <li class="flex items-center gap-1.5">
+          {i > 0 && <Icon name="chevron-right" size={14} class="opacity-60" />}
+          {i < all.length - 1 ? (
+            <a href={href(c.path)} class="transition-colors hover:text-glow">
+              {c.name}
+            </a>
+          ) : (
+            <span aria-current="page" class="text-text">
+              {c.name}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

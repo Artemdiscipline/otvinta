@@ -1,0 +1,92 @@
+---
+/** Отзывы — слайдер на scroll-snap (работает и без JS: свайп/прокрутка). */
+import { reviews } from '@/data/reviews';
+import { service } from '@/data/services';
+import { reviewPlatforms } from '@/data/site';
+import { formatDate } from '@/lib/format';
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+---
+
+<section class="section overflow-hidden" aria-labelledby="reviews-title" aria-roledescription="карусель">
+  <div class="container-x">
+    <SectionHead id="reviews-title" eyebrow="Отзывы" title="Что говорят гости">
+      <div class="flex gap-2" data-slider-nav>
+        <button
+          type="button"
+          class="grid size-12 place-items-center rounded-full border border-line text-text transition hover:border-glow hover:shadow-glow-sm disabled:opacity-40"
+          aria-label="Предыдущий отзыв"
+          aria-controls="reviews-track"
+          data-slide="-1"
+        >
+          <Icon name="chevron-left" />
+        </button>
+        <button
+          type="button"
+          class="grid size-12 place-items-center rounded-full border border-line text-text transition hover:border-glow hover:shadow-glow-sm disabled:opacity-40"
+          aria-label="Следующий отзыв"
+          aria-controls="reviews-track"
+          data-slide="1"
+        >
+          <Icon name="chevron-right" />
+        </button>
+      </div>
+    </SectionHead>
+
+    <ul
+      id="reviews-track"
+      class="no-scrollbar -mx-4 mt-10 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:scroll-px-0 md:px-0"
+      tabindex="0"
+      aria-label="Отзывы гостей"
+      data-slider
+    >
+      {
+        reviews.map((r, i) => (
+          <li
+            class="card flex w-[86%] shrink-0 snap-start flex-col p-6 sm:w-[60%] sm:p-8 lg:w-[calc((100%-2rem)/3)]"
+            aria-roledescription="слайд"
+            aria-label={`${i + 1} из ${reviews.length}`}
+          >
+            <div class="flex items-center justify-between gap-3">
+              <Icon name="quote" size={30} class="text-glow" />
+              {r.rating && (
+                <span class="flex gap-0.5 text-hot" role="img" aria-label={`Оценка ${r.rating} из 5`}>
+                  {Array.from({ length: r.rating }).map(() => (
+                    <Icon name="star" size={16} class="fill-current" />
+                  ))}
+                </span>
+              )}
+            </div>
+            <blockquote class="mt-4 flex-1 text-[1.05rem] leading-relaxed">{r.text}</blockquote>
+            <footer class="mt-6 border-t border-line pt-4">
+              <p class="font-bold">{r.author}</p>
+              <p class="text-sm text-muted">
+                <time datetime={r.date}>{formatDate(r.date)}</time>
+                {r.source && <span> · {r.source}</span>}
+                <span> · {service(r.service).title.toLowerCase()}</span>
+              </p>
+            </footer>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="reveal mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <p class="text-sm text-muted">Больше отзывов о клубе:</p>
+      <div class="flex flex-wrap gap-3">
+        {
+          reviewPlatforms.map((p) => (
+            <a href={p.url} target="_blank" rel="noopener" class="btn btn-ghost btn-sm">
+              Читать отзывы на {p.label} <Icon name="external-link" size={16} />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initSlider } from '@/scripts/slider';
+  initSlider();
+</script>

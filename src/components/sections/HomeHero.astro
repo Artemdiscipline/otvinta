@@ -1,0 +1,183 @@
+---
+/**
+ * Первый экран главной: фон, подзаголовок и порядок карточек зависят от сезона.
+ * Сезон выбирается по месяцу ещё до отрисовки (инлайн-скрипт ниже), фото нужного
+ * сезона предзагружается, остальные не скачиваются, пока их не выберут.
+ */
+import { seasons } from '@/data/offers';
+import { site } from '@/data/site';
+import { BLADE, BLADE_ANGLES } from '@/lib/propeller';
+import { HERO_WIDTHS, photoAlt, photoPos, pictureData } from '@/lib/images';
+import BookButton from '../ui/BookButton.astro';
+import Icon from '../ui/Icon.astro';
+
+const slides = await Promise.all(seasons.map(async (s) => ({ s, pic: await pictureData(s.photo, HERO_WIDTHS) })));
+const pre = Object.fromEntries(slides.map(({ s, pic }) => [s.id, pic.avif]));
+const months = Object.fromEntries(seasons.map((s) => [s.id, s.months]));
+---
+
+<script is:inline define:vars={{ pre, months }}>
+  (function () {
+    var m = new Date().getMonth() + 1;
+    var s = 'summer';
+    for (var k in months) if (months[k].indexOf(m) > -1) s = k;
+    try {
+      var q = new URLSearchParams(location.search).get('season');
+      if (q && months[q]) s = q;
+    } catch (e) {}
+    document.documentElement.dataset.season = s;
+    if (pre[s]) {
+      var l = document.createElement('link');
+      l.rel = 'preload';
+      l.as = 'image';
+      l.type = 'image/avif';
+      l.setAttribute('imagesrcset', pre[s]);
+      l.setAttribute('imagesizes', '100vw');
+      l.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(l);
+    }
+  })();
+</script>
+
+<section
+  class="relative isolate flex min-h-[100svh] items-end overflow-hidden pt-[calc(var(--header-h)+2.5rem)] pb-14 md:min-h-[min(100svh,960px)] md:items-center md:pb-24"
+  aria-labelledby="hero-title"
+>
+  <div class="absolute inset-0 -z-20 will-change-transform" data-parallax>
+    {
+      slides.map(({ s, pic }) => (
+        <div class="hero-slide absolute inset-0 hidden" data-season-slide={s.id}>
+          <picture class="contents">
+            <source type="image/avif" srcset={pic.avif} sizes="100vw" />
+            <source type="image/webp" srcset={pic.webp} sizes="100vw" />
+            <img
+              src={pic.src}
+              width={pic.width}
+              height={pic.height}
+              alt={photoAlt(s.photo)}
+              loading="lazy"
+              decoding="async"
+              class="h-[115%] w-full object-cover"
+              style={`object-position: ${photoPos(s.photo)}`}
+            />
+          </picture>
+        </div>
+      ))
+    }
+  </div>
+  <div
+    class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(5_7_13/0.55)_0%,rgb(5_7_13/0.25)_35%,rgb(5_7_13/0.92)_100%),radial-gradient(90%_70%_at_15%_60%,rgb(5_7_13/0.75),transparent_70%),radial-gradient(70%_60%_at_85%_20%,rgb(10_77_255/0.35),transparent_70%)]"
+  >
+  </div>
+  <div class="grain pointer-events-none absolute inset-0 -z-10"></div>
+
+  <svg
+    class="pointer-events-none absolute -right-48 top-1/2 -z-10 hidden w-[44rem] -translate-y-1/2 opacity-40 lg:block"
+    viewBox="-32 -32 64 64"
+    aria-hidden="true"
+  >
+    <g class="spin-slow" style="transform-box: fill-box; transform-origin: 50% 50%">
+      <circle r="31" fill="none" stroke="#4FB3FF" stroke-width="0.2" stroke-dasharray="1 2"></circle>
+      {BLADE_ANGLES.map((a) => <path d={BLADE} transform={`rotate(${a})`} fill="rgb(30 144 255 / 0.06)" stroke="#4FB3FF" stroke-width="0.35" />)}
+      <circle r="6.5" fill="none" stroke="#4FB3FF" stroke-width="0.35"></circle>
+    </g>
+  </svg>
+
+  <div class="container-x relative">
+    <div class="max-w-4xl">
+      <div class="seg mb-5" role="group" aria-label="Сезон" data-season-switch>
+        {
+          seasons.map((s) => (
+            <button type="button" class="seg-btn !px-3 sm:!px-4" data-season-btn={s.id} aria-pressed="false">
+              <Icon name={s.icon} size={16} />
+              {s.label}
+            </button>
+          ))
+        }
+      </div>
+
+      {
+        seasons.map((s) => (
+          <p class="eyebrow season-text mb-4 hidden w-full" data-season-text={s.id}>
+            {s.kicker}
+          </p>
+        ))
+      }
+
+      <h1
+        id="hero-title"
+        class="font-display text-[clamp(1.85rem,1rem+4.2vw,4.4rem)] leading-[1.04] font-extrabold tracking-tight text-text"
+      >
+        Прокат <span class="text-gradient">снегоходов, квадроциклов</span> и гидроциклов в Казани
+      </h1>
+
+      {
+        seasons.map((s) => (
+          <p
+            class="season-text mt-5 hidden max-w-2xl text-lg font-semibold text-glow sm:text-xl"
+            data-season-text={s.id}
+          >
+            {s.headline}
+          </p>
+        ))
+      }
+
+      <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-text/90 sm:text-base">
+        <li class="flex items-center gap-2">
+          <Icon name="trophy" size={18} class="text-glow" />{site.years.value} лет опыта
+        </li>
+        <li class="flex items-center gap-2">
+          <Icon name="badge-check" size={18} class="text-glow" />самый большой парк Yamaha в России
+        </li>
+        <li class="flex items-center gap-2">
+          <Icon name="map-pin" size={18} class="text-glow" />{site.fromCenter.replace(' Казани', '')}
+        </li>
+      </ul>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <BookButton label="Забронировать заезд" size="lg" />
+        <a href="#trassy" class="btn btn-ghost btn-lg">
+          Выбрать трассу <Icon name="route" size={18} />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <a
+    href="#uslugi"
+    class="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-muted transition-colors hover:text-text md:flex"
+    aria-label="Прокрутить к услугам"
+  >
+    <span class="relative block h-10 w-6 rounded-full border-2 border-muted/60">
+      <span class="absolute left-1/2 top-2 block h-2 w-1 -translate-x-1/2 animate-bounce rounded bg-glow"></span>
+    </span>
+  </a>
+</section>
+
+<style is:global>
+  html:not([data-season]) [data-season-slide='summer'],
+  html[data-season='winter'] [data-season-slide='winter'],
+  html[data-season='summer'] [data-season-slide='summer'],
+  html[data-season='offseason'] [data-season-slide='offseason'] {
+    display: block;
+  }
+  html:not([data-season]) [data-season-text='summer'],
+  html[data-season='winter'] [data-season-text='winter'],
+  html[data-season='summer'] [data-season-text='summer'],
+  html[data-season='offseason'] [data-season-text='offseason'] {
+    display: block;
+  }
+  html:not([data-season]) .eyebrow[data-season-text='summer'],
+  html[data-season='winter'] .eyebrow[data-season-text='winter'],
+  html[data-season='summer'] .eyebrow[data-season-text='summer'],
+  html[data-season='offseason'] .eyebrow[data-season-text='offseason'] {
+    display: inline-flex;
+  }
+</style>
+
+<script>
+  import { initSeason } from '@/scripts/season';
+  import { initParallax } from '@/scripts/parallax';
+  initSeason();
+  initParallax();
+</script>

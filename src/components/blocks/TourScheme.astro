@@ -1,0 +1,47 @@
+---
+/** Схема маршрута тура (не в масштабе): река + линия маршрута + точки. */
+import type { JetTour } from '@/data/prices';
+
+interface Props {
+  tour: JetTour;
+}
+const { tour } = Astro.props;
+const pts = tour.scheme;
+const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y * 0.6}`).join(' ');
+const uid = tour.id;
+---
+
+<figure class="relative overflow-hidden rounded-2xl border border-line">
+  <svg viewBox="0 0 100 60" class="blueprint block h-auto w-full" role="img" aria-label={`Схема маршрута «${tour.name}»: ${tour.route.join(' → ')}`}>
+    <defs>
+      <linearGradient id={`${uid}-river`} x1="0" x2="1">
+        <stop offset="0" stop-color="#0A4DFF" stop-opacity="0.55"></stop>
+        <stop offset="1" stop-color="#1E90FF" stop-opacity="0.35"></stop>
+      </linearGradient>
+    </defs>
+    <path d="M-5 44 C 15 36, 30 50, 50 38 S 85 18, 105 22" stroke={`url(#${uid}-river)`} stroke-width="11" fill="none" stroke-linecap="round"></path>
+    <path d="M-5 44 C 15 36, 30 50, 50 38 S 85 18, 105 22" stroke="#4FB3FF" stroke-width="0.3" stroke-opacity="0.6" fill="none"></path>
+    <path d={d} stroke="#FF6A1A" stroke-width="0.9" stroke-dasharray="2 1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+    {
+      pts.map((p, i) => (
+        <g>
+          <circle cx={p.x} cy={p.y * 0.6} r={i === 0 ? 2 : 1.4} fill={i === 0 ? '#FF6A1A' : '#EAF2FF'} stroke="#05070D" stroke-width="0.5" />
+          {p.label && (
+            <text
+              x={p.x}
+              y={p.y * 0.6 - 3}
+              text-anchor={p.x > 80 ? 'end' : p.x < 15 ? 'start' : 'middle'}
+              font-size="3.4"
+              font-weight="700"
+              fill="#EAF2FF"
+              font-family="'Manrope Variable', sans-serif"
+            >
+              {p.label}
+            </text>
+          )}
+        </g>
+      ))
+    }
+  </svg>
+  <figcaption class="absolute bottom-2 right-3 text-[0.65rem] font-semibold text-muted">схема, не в масштабе</figcaption>
+</figure>

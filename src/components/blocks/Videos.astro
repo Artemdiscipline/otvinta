@@ -1,0 +1,32 @@
+---
+import type { Video } from '@/data/videos';
+import SectionHead from '../ui/SectionHead.astro';
+import LiteVideo from './LiteVideo.astro';
+
+interface Props {
+  items: Video[];
+  title?: string;
+  lead?: string;
+}
+const { items, title = 'Посмотрите, как это выглядит', lead = 'Ролики клуба — без постановки: трассы, вода и техника как есть.' } = Astro.props;
+---
+
+<section class="section" aria-labelledby="video-title">
+  <div class="container-x">
+    <SectionHead id="video-title" eyebrow="Видео" title={title} lead={lead} />
+    <div
+      class:list={[
+        'mt-10 grid gap-6',
+        items.length >= 3 ? 'md:grid-cols-3' : items.length === 2 ? 'md:grid-cols-2' : 'max-w-3xl',
+        items.some((v) => v.vertical) && 'items-start',
+      ]}
+    >
+      {items.map((v) => <LiteVideo video={v} class={v.vertical ? 'mx-auto w-full max-w-[19rem]' : undefined} />)}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initVideos } from '@/scripts/video';
+  initVideos();
+</script>

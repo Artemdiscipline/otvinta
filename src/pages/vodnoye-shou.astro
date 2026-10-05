@@ -1,0 +1,112 @@
+---
+import Advantages from '@/components/blocks/Advantages.astro';
+import Gallery from '@/components/blocks/Gallery.astro';
+import LeadFooter from '@/components/blocks/LeadFooter.astro';
+import LeadSuccess from '@/components/blocks/LeadSuccess.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Field from '@/components/ui/Field.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Pic from '@/components/ui/Pic.astro';
+import { show } from '@/data/offers';
+import { pages } from '@/data/pages';
+import { mainPhone } from '@/data/site';
+import Base from '@/layouts/Base.astro';
+import { telHref } from '@/lib/format';
+import { servicePageLd } from '@/lib/schema';
+
+const meta = pages.show;
+const origin = String(Astro.site);
+const uid = 'show';
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  path={meta.path}
+  jsonLd={servicePageLd(origin, { name: 'Аквабайк-шоу', path: meta.path, crumb: meta.crumb })}
+>
+  <PageHero
+    photo="show-jet-flip"
+    eyebrow="Круглый год · выезд в любой город"
+    title="Аквабайк-шоу на ваш праздник"
+    lead="Профессиональные спортсмены клуба показывают головокружительные трюки на гидроциклах, ховербордах и флайбордах. Выступаем на Днях города, праздниках и открытиях соревнований."
+    crumbs={[{ name: meta.crumb, path: meta.path }]}
+    cta={false}
+    facts={[
+      { icon: 'users', label: 'Спортсменов', value: `от ${show.athletes.min} до ${show.athletes.max}` },
+      { icon: 'timer', label: 'Длительность', value: show.duration },
+      { icon: 'droplets', label: 'Площадка', value: 'вода или бассейн' },
+      { icon: 'ticket', label: 'Стоимость', value: 'по запросу' },
+    ]}
+    secondary={{ label: 'Рассчитать шоу', href: '#raschet', icon: 'calculator' }}
+  />
+
+  <section class="section" aria-labelledby="show-about-title">
+    <div class="container-x grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class="reveal">
+        <p class="eyebrow mb-3">О шоу</p>
+        <h2 id="show-about-title" class="h-section">От разминки до финала, от которого замирают</h2>
+        <p class="lead mt-4">{show.dramaturgy}</p>
+        <ul class="mt-6 flex flex-wrap gap-2">
+          {show.tricks.map((t) => <li class="chip">Трюки на технике: {t}</li>)}
+        </ul>
+        <div class="mt-8 grid gap-3 sm:grid-cols-2">
+          {
+            show.venues.map((v) => (
+              <div class="card p-5">
+                <span class="flex items-center gap-2 font-bold">
+                  <Icon name={v.icon} size={20} class="text-glow" />
+                  {v.title}
+                </span>
+                <p class="mt-2 text-sm text-muted">{v.text}</p>
+              </div>
+            ))
+          }
+        </div>
+        <p class="mt-6 text-sm text-muted">
+          Число спортсменов зависит от масштаба шоу и бюджета. Всё снаряжение и оборудование привозим с собой.
+        </p>
+      </div>
+      <div class="reveal photo-shade relative aspect-square overflow-hidden rounded-3xl border border-line" style="--d:120ms">
+        <Pic photo="show-backflip" sizes="(min-width: 1024px) 45vw, 100vw" widths={[480, 640]} />
+      </div>
+    </div>
+  </section>
+
+  <Advantages items={show.achievements} title="Нам доверяют большие праздники" eyebrow="Спортсмены клуба" />
+  <Gallery photos={['show-jet-flip', 'show-backflip', 'flyboard-silhouette']} title="Шоу на воде" />
+
+  <section id="raschet" class="slant-top relative overflow-hidden bg-surface pb-20 md:pb-28" aria-labelledby="show-form-title">
+    <div class="container-x grid gap-10 lg:grid-cols-[0.9fr_1.3fr]">
+      <div class="reveal">
+        <p class="eyebrow mb-3">Расчёт</p>
+        <h2 id="show-form-title" class="h-section">Рассчитать шоу</h2>
+        <p class="lead mt-4">
+          Цена зависит от города, площадки, числа спортсменов и длительности программы — посчитаем под ваш праздник.
+        </p>
+        <p class="mt-6 text-sm text-muted">
+          Или позвоните: <a href={telHref(mainPhone.e164)} class="font-bold text-text hover:text-glow">{mainPhone.display}</a>
+        </p>
+      </div>
+      <div class="reveal card p-5 sm:p-8" style="--d:120ms">
+        <form class="lead-form grid gap-4" novalidate data-lead-form data-lead-title="Заявка на аквабайк-шоу с сайта «От винта»">
+          <div class="lead-fields grid gap-4">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <Field uid={uid} name="date" label="Дата мероприятия" type="date" required error="Выберите дату не раньше сегодняшней" />
+              <Field uid={uid} name="city" label="Город" required error="Укажите город" placeholder="Казань" />
+              <Field uid={uid} name="venue" label="Площадка" type="select" options={show.venueOptions} />
+              <Field uid={uid} name="format" label="Формат мероприятия" type="select" options={show.eventFormats} />
+              <Field uid={uid} name="athletes" label="Сколько спортсменов" type="number" min={show.athletes.min} max={show.athletes.max} value="1" error={`От ${show.athletes.min} до ${show.athletes.max}`} />
+              <Field uid={uid} name="budget" label="Бюджет (если есть)" placeholder="Например, до … ₽" />
+              <Field uid={uid} name="name" label="Имя" required error="Как к вам обращаться?" autocomplete="name" />
+              <Field uid={uid} name="phone" label="Телефон" type="tel" required error="Введите номер полностью: +7 (XXX) XXX-XX-XX" />
+            </div>
+            <Field uid={uid} name="comment" label="Комментарий" type="textarea" placeholder="Сценарий, время выступления, особенности площадки" />
+            <LeadFooter uid={uid} submit="Рассчитать шоу" />
+          </div>
+          <LeadSuccess text="Администратор свяжется с вами, уточнит детали и пришлёт расчёт." />
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>

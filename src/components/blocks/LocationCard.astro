@@ -1,0 +1,49 @@
+---
+import type { Location } from '@/data/site';
+import { service } from '@/data/services';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  loc: Location;
+  index?: number;
+  route?: boolean;
+}
+const { loc, index = 0, route = true } = Astro.props;
+const yandex = `https://yandex.ru/maps/?rtext=~${loc.geo.lat},${loc.geo.lon}&rtt=auto`;
+const twoGis = `https://2gis.ru/kazan/directions/points/%7C${loc.geo.lon}%2C${loc.geo.lat}${loc.twoGisFirm ? `%3B${loc.twoGisFirm}` : ''}`;
+const accent = index === 1;
+---
+
+<article class:list={['card relative flex flex-col overflow-hidden p-6 sm:p-8', accent && 'border-hot/40']}>
+  <div class:list={['absolute inset-x-0 top-0 h-1', accent ? 'bg-hot' : 'bg-electric']}></div>
+  <div class="flex items-center gap-3">
+    <span class:list={['grid size-12 place-items-center rounded-2xl ring-1', accent ? 'bg-hot/15 text-hot ring-hot/40' : 'bg-deep/25 text-glow ring-glow/30']}>
+      <Icon name={loc.icon} size={24} />
+    </span>
+    <div>
+      <h3 class="font-display text-lg font-bold sm:text-xl">{loc.title}</h3>
+      <p class="text-sm text-muted">{loc.services.map((s) => service(s).nav).join(' · ')}</p>
+    </div>
+  </div>
+  <address class="mt-5 not-italic">
+    <p class="font-bold">{loc.locality}</p>
+    <p>{loc.street}{loc.streetClarify && <span class="clarify" title="Уточняйте у администратора">*</span>}</p>
+    <p class="mt-1 text-sm text-muted">{loc.landmarks.join(' · ')} · {loc.note}</p>
+  </address>
+  {
+    route && (
+      <ol class="mt-5 grid gap-2 text-sm">
+        {loc.route.map((r, i) => (
+          <li class="flex gap-3">
+            <span class:list={['grid size-6 shrink-0 place-items-center rounded-full text-xs font-extrabold', accent ? 'bg-hot text-ink' : 'bg-deep text-white']}>{i + 1}</span>
+            <span class="text-text/90">{r}</span>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+  <div class="mt-6 flex flex-wrap gap-2">
+    <a href={yandex} target="_blank" rel="noopener" class="btn btn-ghost btn-sm"><Icon name="navigation" size={16} /> Маршрут в Яндекс Картах</a>
+    <a href={twoGis} target="_blank" rel="noopener" class="btn btn-ghost btn-sm"><Icon name="car" size={16} /> Маршрут в 2ГИС</a>
+  </div>
+</article>
