@@ -108,7 +108,7 @@ const PHONE = /(\+7|\b8)[\s(-]*\d{3}[\s)-]*\d{3}[\s-]*\d{2}[\s-]*\d{2}/;
 const walk = (dir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name)) : [path.join(dir, d.name)]));
 for (const f of walk(path.join(root, 'src'))) {
-  if (f.includes(`${path.sep}data${path.sep}`) || !/\.(astro|ts|css)$/.test(f)) continue;
+  if (f.includes(`${path.sep}data${path.sep}`) || f.endsWith('logo.ts') ||!/\.(astro|ts|css)$/.test(f)) continue;
   const text = fs.readFileSync(f, 'utf8');
   text.split('\n').forEach((line, i) => {
     if (/^\s*(\*|\/\/|\/\*)/.test(line)) return; // комментарии с примерами

@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import sharp from 'sharp';
-import { propellerSvg } from '../src/lib/propeller.ts';
+import { markSvg as propellerSvg, logoSvg } from '../src/lib/logo-svg.ts';
 import { site } from '../src/data/site.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -105,8 +105,7 @@ if (chromium) {
   </style></head><body>
   <div class="ph"></div>
   <div class="c">
-    <div class="logo"><span>ОТ</span>${prop}<span>ВИНТА</span></div>
-    <div class="sl">${site.slogan.toUpperCase()}</div>
+    ${logoSvg({ variant: 'full', uid: 'og', width: 560, spin: false })}
     <h1>Снегоходы, квадроциклы и гидроциклы в&nbsp;Казани</h1>
     <p>${site.fromCenter} · техника Yamaha</p>
   </div>
